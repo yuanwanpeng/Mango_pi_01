@@ -1,0 +1,10 @@
+mango_pi_01\malloc.o: ..\Src\malloc.c
+mango_pi_01\malloc.o: ../Inc/malloc.h
+mango_pi_01\malloc.o: C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include\stm32f10x.h
+mango_pi_01\malloc.o: .\RTE\_Mango_pi_01\RTE_Components.h
+mango_pi_01\malloc.o: ../Drivers/CMSIS/Include/core_cm3.h
+mango_pi_01\malloc.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+mango_pi_01\malloc.o: ../Drivers/CMSIS/Include/core_cmInstr.h
+mango_pi_01\malloc.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
+mango_pi_01\malloc.o: ../Drivers/CMSIS/Include/core_cmFunc.h
+mango_pi_01\malloc.o: C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include\system_stm32f10x.h
