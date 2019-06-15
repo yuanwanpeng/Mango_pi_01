@@ -1,7 +1,7 @@
 mango_pi_01\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/port.c
 mango_pi_01\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-mango_pi_01\port.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
-mango_pi_01\port.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+mango_pi_01\port.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+mango_pi_01\port.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 mango_pi_01\port.o: ../Inc/FreeRTOSConfig.h
 mango_pi_01\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 mango_pi_01\port.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

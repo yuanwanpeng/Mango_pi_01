@@ -5,12 +5,12 @@ mango_pi_01\ff.o: ../Inc/ffconf.h
 mango_pi_01\ff.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 mango_pi_01\ff.o: ../Inc/stm32f1xx_hal_conf.h
 mango_pi_01\ff.o: ../Inc/main.h
-mango_pi_01\ff.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-mango_pi_01\ff.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+mango_pi_01\ff.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+mango_pi_01\ff.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 mango_pi_01\ff.o: ..\HARDWARE\BOARD_INFO\board_info.h
 mango_pi_01\ff.o: ../Inc/main.h
 mango_pi_01\ff.o: ..\CJSON\cJSON.h
-mango_pi_01\ff.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+mango_pi_01\ff.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 mango_pi_01\ff.o: ..\PROTOCOL\Mqtt.h
 mango_pi_01\ff.o: ..\HARDWARE\SIM800C\SIM800C.h
 mango_pi_01\ff.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
@@ -28,7 +28,7 @@ mango_pi_01\ff.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 mango_pi_01\ff.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 mango_pi_01\ff.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 mango_pi_01\ff.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
-mango_pi_01\ff.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+mango_pi_01\ff.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 mango_pi_01\ff.o: ..\HARDWARE\SIM800C\SIM800C_Send_State_data.h
 mango_pi_01\ff.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 mango_pi_01\ff.o: ..\HARDWARE\SIM800C\SIM800C.h
@@ -45,7 +45,7 @@ mango_pi_01\ff.o: ../Drivers/CMSIS/Include/core_cmInstr.h
 mango_pi_01\ff.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 mango_pi_01\ff.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 mango_pi_01\ff.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
-mango_pi_01\ff.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+mango_pi_01\ff.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 mango_pi_01\ff.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 mango_pi_01\ff.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 mango_pi_01\ff.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h
@@ -61,4 +61,4 @@ mango_pi_01\ff.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 mango_pi_01\ff.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 mango_pi_01\ff.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 mango_pi_01\ff.o: ../Middlewares/Third_Party/FatFs/src/diskio.h
-mango_pi_01\ff.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
+mango_pi_01\ff.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h

@@ -24,11 +24,19 @@ void Recv_SEND_OK_Opt(void)
 {
 	BaseType_t err;
 	memset(Send_data_recv,'\0',32);
-	strcpy(Send_data_recv,"SEND OK\r\n");
+	strcpy(Send_data_recv,"\r\nSEND OK\r\n");
 	
 	taskENTER_CRITICAL();				//进入临界区
 	G_p_index_start = strstr((const char*)G_p_index_end,"\r\nSEND OK\r\n");
+	if(G_p_index_end < pData)
+	{
+		printf("Recv_SEND_OK_Opt =addr= 0x04");
+	}
 	G_p_index_end = strstr((const char*)G_p_index_end,"\r\nSEND OK\r\n");
+	if(G_p_index_end < pData)
+	{
+		printf("Recv_SEND_OK_Opt =addr= 0x04");
+	}
 	/*检查后面有没有数据*/
 	uint8_t end_data_len;	//结尾后的数据长度
 	G_p_index_end += (strlen("\r\nSEND OK\r\n"));	//最后一个字节\r\nSEND OK\r\n_这个底杠位置
@@ -41,7 +49,6 @@ void Recv_SEND_OK_Opt(void)
 			(uint32_t)RCV_SEND_OK,
 			(eNotifyAction)eSetValueWithOverwrite);//发送SEND OK信号
 	}
-	printf("sendokG_p_index_end = %x,end_data_len = %d,err = %d\r\n",G_p_index_end,end_data_len,err);
 	if(end_data_len == 0)	//(=0表示OK\r\n 之后一个字节数据地址)判断是否等于0 0 表示后面没有数据
 	{
 		Reset_Uart_DMA();
@@ -92,8 +99,15 @@ void Recv_Symbol_Opt(void)
 	strcpy(Send_data_recv,">");
 	taskENTER_CRITICAL();				//进入临界区
 	G_p_index_start = strstr((const char*)G_p_index_end,"\r\n>");
+		if(G_p_index_end < pData)
+	{
+		printf("Recv_Symbol_Opt =addr= 0x04");
+	}
 	G_p_index_end = strstr((const char*)G_p_index_end,"\r\n> ");
-
+	if(G_p_index_end < pData)
+	{
+		printf("Recv_Symbol_Opt =addr= 0x04");
+	}
 	/*检查后面有没有数据*/
 	uint8_t end_data_len;	//结尾后的数据长度
 	G_p_index_end += (strlen("\r\n> "));	//最后一个字节OK\r\n_这个底杠位置
@@ -102,7 +116,7 @@ void Recv_Symbol_Opt(void)
 	err = xTaskNotify((TaskHandle_t)Start_Send_State_data_TaskHandle,//发送至主任务线程
 		(uint32_t)RCV_WRITE_SYMBEL,
 		(eNotifyAction)eSetValueWithOverwrite);
-	printf(">G_p_index_end = %s,end_data_len = %d,err = %d\r\n",G_p_index_end,end_data_len,err);
+//	printf(">G_p_index_end = %s,end_data_len = %d,err = %d\r\n",G_p_index_end,end_data_len,err);
 	if(end_data_len == 0)	//(表示OK\r\n 之后一个字节数据地址)判断是否等于0 0 表示后面没有数据
 	{
 		printf("Reset_Uart_DMA\r\n");
@@ -174,16 +188,16 @@ void Start_Scheduler_data_Task(void const * argument)
 				printf("into csq = %s\r\n",G_p_index_end);
 				Recv_CSQ_Opt();			//接收到信号强度信号操作
 			}
-			str = strstr((const char*)G_p_index_end,"SEND OK\r\n");//如果是信号信息
+			str = strstr((const char*)G_p_index_end,"\r\nSEND OK\r\n");//如果是信号信息
 			if(str != NULL)
 			{
 				Recv_SEND_OK_Opt();		//接收到SEND OK操作
 			}
 		}
-		if(strstr((const char*)G_p_index_end,">"))//返回了>符号
+		if(strstr((const char*)G_p_index_end,"\r\n> "))//返回了>符号
 		{
 			//printf("pData> = %s\r\n",pData);
-			str = strstr((const char*)G_p_index_end,">");//如果是待发送符号信息
+			str = strstr((const char*)G_p_index_end,"\r\n> ");//如果是待发送符号信息
 			if(str != NULL)
 			{
 				Recv_Symbol_Opt();

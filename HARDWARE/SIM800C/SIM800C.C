@@ -42,9 +42,9 @@ void reset_Sim800C(void)
 	SIM800C_PWKEY_CTL_L;
 	osDelay(1000);
 	SIM800C_PWKEY_CTL_H;
-	osDelay(1500);
+	osDelay(3000);
 	SIM800C_PWKEY_CTL_L;
-	osDelay(4000);	
+	osDelay(2000);
 	printf("restart 800c\r\n");
 	Reset_Uart_DMA();
 }
@@ -102,8 +102,8 @@ void init_Sim800C(void)
 void Start_Reset_Sim800c_Task(void const * argument)
 {
 	osDelay(100);
-	vTaskSuspend( Start_Scheduler_data_Task_TaskHandle );		//挂起lcd12864显示主菜单的进程
-	vTaskSuspend( Start_SIM800C_TaskHandle );		//挂起lcd12864显示主菜单的进程
+	vTaskSuspend( Start_Scheduler_data_Task_TaskHandle );	//挂起调度数据进程
+	vTaskSuspend( Start_SIM800C_TaskHandle );				//挂起800C的进程
 	
 	if(Start_Send_State_data_TaskHandle != NULL){
 		osThreadTerminate(Start_Send_State_data_TaskHandle);//删除发送任务
@@ -163,9 +163,9 @@ void Start_Sim800c_Task(void const * argument)
 
 	while(1)
 	{
-//		xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//获取互斥信号量
-//		Get_Sim800C_Signal();
-//		xSemaphoreGive(Sim800c_Semaphore);//释放信号量
+		xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//获取互斥信号量
+		Get_Sim800C_Signal();
+		xSemaphoreGive(Sim800c_Semaphore);//释放信号量
 		//printf("G_Sim800C_Signal = %d\r\n",G_Sim800C_Signal);
 		//12864显示出信号
 		osDelay(15000);

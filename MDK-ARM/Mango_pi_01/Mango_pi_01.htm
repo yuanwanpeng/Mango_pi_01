@@ -3,7 +3,7 @@
 <title>Static Call Graph - [Mango_pi_01\Mango_pi_01.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image Mango_pi_01\Mango_pi_01.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Jun 12 16:40:50 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sat Jun 15 20:27:04 2019
 <BR><P>
 <H3>Maximum Stack Usage =        592 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1308,7 +1308,8 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPRS_AT_CSQ
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_Sim800C
+<BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Sim800c_Task
+<LI><a href="#[1ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_Sim800C
 </UL>
 
 <P><STRONG><a name="[129]"></a>HAL_DMA_Abort</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, stm32f1xx_hal_dma.o(i.HAL_DMA_Abort))
@@ -2908,7 +2909,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Scheduler_data_Task
 </UL>
 
-<P><STRONG><a name="[19d]"></a>Recv_SEND_OK_Opt</STRONG> (Thumb, 96 bytes, Stack size 16 bytes, sim800c_scheduler_data.o(i.Recv_SEND_OK_Opt))
+<P><STRONG><a name="[19d]"></a>Recv_SEND_OK_Opt</STRONG> (Thumb, 110 bytes, Stack size 16 bytes, sim800c_scheduler_data.o(i.Recv_SEND_OK_Opt))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = Recv_SEND_OK_Opt &rArr; Reset_Uart_DMA &rArr; HAL_UART_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortExitCritical
@@ -2924,7 +2925,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Scheduler_data_Task
 </UL>
 
-<P><STRONG><a name="[19e]"></a>Recv_Symbol_Opt</STRONG> (Thumb, 98 bytes, Stack size 16 bytes, sim800c_scheduler_data.o(i.Recv_Symbol_Opt))
+<P><STRONG><a name="[19e]"></a>Recv_Symbol_Opt</STRONG> (Thumb, 114 bytes, Stack size 16 bytes, sim800c_scheduler_data.o(i.Recv_Symbol_Opt))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = Recv_Symbol_Opt &rArr; Reset_Uart_DMA &rArr; HAL_UART_Receive_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortExitCritical
@@ -3357,14 +3358,17 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> sim800c.o(.constdata)
 </UL>
-<P><STRONG><a name="[66]"></a>Start_Sim800c_Task</STRONG> (Thumb, 104 bytes, Stack size 64 bytes, sim800c.o(i.Start_Sim800c_Task))
+<P><STRONG><a name="[66]"></a>Start_Sim800c_Task</STRONG> (Thumb, 136 bytes, Stack size 64 bytes, sim800c.o(i.Start_Sim800c_Task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 224<LI>Call Chain = Start_Sim800c_Task &rArr; osThreadCreate &rArr; xTaskCreate &rArr; pvPortMalloc &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortExitCritical
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vPortEnterCritical
 <LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osThreadCreate
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericSend
+<LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueGenericReceive
 <LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueCreateMutex
+<LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Sim800C_Signal
 <LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy4
 <LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
@@ -4352,7 +4356,8 @@ Global Symbols
 <LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskResumeAll
 <LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskSuspendAll
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check_Soft_Versions
+<BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Sim800c_Task
+<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check_Soft_Versions
 <LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check_Serial_Number
 <LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check_Hardware_Versions
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check_Device_ID
@@ -4386,7 +4391,8 @@ Global Symbols
 <LI><a href="#[1cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xTaskResumeAll
 <LI><a href="#[1cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vTaskSuspendAll
 </UL>
-<BR>[Called By]<UL><LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueCreateMutex
+<BR>[Called By]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Sim800c_Task
+<LI><a href="#[1ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xQueueCreateMutex
 <LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_Version_Information
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Start_Send_State_data_Task
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Connect_OneNet

@@ -1,5 +1,5 @@
 mango_pi_01\user_diskio.o: ../Src/user_diskio.c
-mango_pi_01\user_diskio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+mango_pi_01\user_diskio.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 mango_pi_01\user_diskio.o: ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h
 mango_pi_01\user_diskio.o: ../Middlewares/Third_Party/FatFs/src/diskio.h
 mango_pi_01\user_diskio.o: ../Middlewares/Third_Party/FatFs/src/integer.h
@@ -8,12 +8,12 @@ mango_pi_01\user_diskio.o: ../Inc/ffconf.h
 mango_pi_01\user_diskio.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 mango_pi_01\user_diskio.o: ../Inc/stm32f1xx_hal_conf.h
 mango_pi_01\user_diskio.o: ../Inc/main.h
-mango_pi_01\user_diskio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-mango_pi_01\user_diskio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+mango_pi_01\user_diskio.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+mango_pi_01\user_diskio.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 mango_pi_01\user_diskio.o: ..\HARDWARE\BOARD_INFO\board_info.h
 mango_pi_01\user_diskio.o: ../Inc/main.h
 mango_pi_01\user_diskio.o: ..\CJSON\cJSON.h
-mango_pi_01\user_diskio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+mango_pi_01\user_diskio.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 mango_pi_01\user_diskio.o: ..\PROTOCOL\Mqtt.h
 mango_pi_01\user_diskio.o: ..\HARDWARE\SIM800C\SIM800C.h
 mango_pi_01\user_diskio.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
@@ -47,7 +47,7 @@ mango_pi_01\user_diskio.o: ../Drivers/CMSIS/Include/core_cmInstr.h
 mango_pi_01\user_diskio.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 mango_pi_01\user_diskio.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 mango_pi_01\user_diskio.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
-mango_pi_01\user_diskio.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+mango_pi_01\user_diskio.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 mango_pi_01\user_diskio.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 mango_pi_01\user_diskio.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 mango_pi_01\user_diskio.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h

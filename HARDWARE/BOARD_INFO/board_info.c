@@ -392,7 +392,7 @@ uint8_t Send_Version_Information(void)
 			(uint32_t)0xffffffff,
 			(uint32_t*)&NotifyValue,
 			(TickType_t)10000);
-	cmp = strcmp(Send_data_recv,"SEND OK");//对比是不是这个数据
+	cmp = strcmp(Send_data_recv,"\r\nSEND OK\r\n");//对比是不是这个数据
 	if(err == pdFALSE){
 		return ERROR;
 	}else if((err == pdTRUE)&&(NotifyValue == RCV_SEND_OK)&&(cmp == 0)){

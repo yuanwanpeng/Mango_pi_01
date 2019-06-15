@@ -3,12 +3,12 @@ mango_pi_01\http_code.o: ..\HARDWARE\ESP8266\HTTP_CODE.h
 mango_pi_01\http_code.o: ..\HARDWARE\HUMI\HUMI.h
 mango_pi_01\http_code.o: ..\HARDWARE\24C0X\IIC.h
 mango_pi_01\http_code.o: ../Inc/main.h
-mango_pi_01\http_code.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-mango_pi_01\http_code.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+mango_pi_01\http_code.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+mango_pi_01\http_code.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 mango_pi_01\http_code.o: ..\HARDWARE\BOARD_INFO\board_info.h
 mango_pi_01\http_code.o: ../Inc/main.h
 mango_pi_01\http_code.o: ..\CJSON\cJSON.h
-mango_pi_01\http_code.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+mango_pi_01\http_code.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 mango_pi_01\http_code.o: ..\PROTOCOL\Mqtt.h
 mango_pi_01\http_code.o: ..\HARDWARE\SIM800C\SIM800C.h
 mango_pi_01\http_code.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
@@ -37,7 +37,7 @@ mango_pi_01\http_code.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 mango_pi_01\http_code.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 mango_pi_01\http_code.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
 mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
-mango_pi_01\http_code.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+mango_pi_01\http_code.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h
@@ -51,7 +51,7 @@ mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h
 mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 mango_pi_01\http_code.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
-mango_pi_01\http_code.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+mango_pi_01\http_code.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 mango_pi_01\http_code.o: ..\HARDWARE\SIM800C\SIM800C_Send_State_data.h
 mango_pi_01\http_code.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 mango_pi_01\http_code.o: ..\HARDWARE\SIM800C\SIM800C.h
@@ -92,4 +92,4 @@ mango_pi_01\http_code.o: ..\HARDWARE\LCD12864\LCD12864_Display_Menu_Set_Time.h
 mango_pi_01\http_code.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 mango_pi_01\http_code.o: ..\HARDWARE\LCD12864\LCD12864_Display_Menu_Stroking_Cycle.h
 mango_pi_01\http_code.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
-mango_pi_01\http_code.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+mango_pi_01\http_code.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

@@ -134,7 +134,7 @@ uint16_t Connect_OneNet(void)
 	uint8_t cmp;
 	while(GPRS_AT_CIPSEND(AT_CIPSEND,">")==ERROR)
 	{
-		printf("Send_Temp_Humi_F_R CIPSEND reset\r\n");
+		printf("Connect_OneNet CIPSEND reset\r\n");
 		xSemaphoreGive(Sim800c_Semaphore);
 		taskENTER_CRITICAL();				//进入临界区
 		osThreadDef(Reset_Sim800c_Task, Start_Reset_Sim800c_Task, osPriorityNormal, 0, 128);	//开启重启Sim800C初始化调度函数
@@ -148,7 +148,7 @@ uint16_t Connect_OneNet(void)
 			(uint32_t)0xffffffff,
 			(uint32_t*)&NotifyValue,
 			(TickType_t)10000);
-	cmp = strcmp((const char*)Send_data_recv,"SEND OK");//对比是不是这个数据
+	cmp = strcmp((const char*)Send_data_recv,"\r\nSEND OK\r\n");//对比是不是这个数据
 	osDelay(1000);
 	printf("Connect_OneNet ok\r\n");
 	Reset_Uart_DMA();

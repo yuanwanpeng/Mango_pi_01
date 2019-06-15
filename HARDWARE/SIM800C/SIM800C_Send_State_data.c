@@ -64,7 +64,7 @@ void Send_Temp_Humi_F_R(void)
 			(uint32_t)0xffffffff,
 			(uint32_t*)&NotifyValue,
 			(TickType_t)15000);//持续15秒钟时间
-	cmp = strcmp(Send_data_recv,"SEND OK");//对比是不是这个数据
+	cmp = strcmp(Send_data_recv,"\r\nSEND OK\r\n");//对比是不是这个数据
 	if(err == pdFALSE){
 		cnt++;
 		if(cnt == 3){
