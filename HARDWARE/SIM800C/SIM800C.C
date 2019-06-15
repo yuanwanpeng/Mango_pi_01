@@ -102,12 +102,20 @@ void init_Sim800C(void)
 void Start_Reset_Sim800c_Task(void const * argument)
 {
 	osDelay(100);
-	vTaskSuspend( Start_Scheduler_data_Task_TaskHandle );	//挂起调度数据进程
+	//vTaskSuspend( Start_Scheduler_data_Task_TaskHandle );
 	vTaskSuspend( Start_SIM800C_TaskHandle );				//挂起800C的进程
 	
 	if(Start_Send_State_data_TaskHandle != NULL){
 		osThreadTerminate(Start_Send_State_data_TaskHandle);//删除发送任务
 		Start_Send_State_data_TaskHandle = NULL;
+	}
+	if(Start_Scheduler_data_Task_TaskHandle != NULL){
+		osThreadTerminate(Start_Scheduler_data_Task_TaskHandle);//删除调度数据进程
+		Start_Scheduler_data_Task_TaskHandle = NULL;
+	}
+	if(Start_Recv_Onenet_data_TaskHandle != NULL){
+		osThreadTerminate(Start_Recv_Onenet_data_TaskHandle);//删除调度数据进程
+		Start_Recv_Onenet_data_TaskHandle = NULL;
 	}
 	printf("init_sim800C\r\n");
 	init_Sim800C();
@@ -130,6 +138,13 @@ void Start_Reset_Sim800c_Task(void const * argument)
 	G_Delete_Task_struct.D_Task = Start_Reset_Sim800c_Task_TaskHandle;
 	Start_Reset_Sim800c_Task_TaskHandle = NULL;
 	G_Delete_Task_struct.sign = ENABLE;
+
+	osThreadDef(Scheduler_data_Task, Start_Scheduler_data_Task, osPriorityNormal, 0, 128);	//开启数据返回任务调度函数
+	Start_Scheduler_data_Task_TaskHandle = osThreadCreate(osThread(Scheduler_data_Task), NULL);
+
+	osThreadDef(Recv_Onenet_data_Task, Start_Recv_Onenet_data_Task, osPriorityNormal, 0, 128);	//创建接收数据
+	Start_Recv_Onenet_data_TaskHandle = osThreadCreate(osThread(Recv_Onenet_data_Task), NULL);	//
+
 	while(1)
 	{
 		osDelay(1000);
@@ -150,14 +165,8 @@ void Start_Sim800c_Task(void const * argument)
 	
 	taskENTER_CRITICAL();				//进入临界区
 	
-	osThreadDef(Scheduler_data_Task, Start_Scheduler_data_Task, osPriorityNormal, 0, 128);	//开启数据返回任务调度函数
-	Start_Scheduler_data_Task_TaskHandle = osThreadCreate(osThread(Scheduler_data_Task), NULL);
-	
 	osThreadDef(Reset_Sim800c_Task, Start_Reset_Sim800c_Task, osPriorityNormal, 0, 128);	//开启重启Sim800C初始化调度函数
 	Start_Reset_Sim800c_Task_TaskHandle = osThreadCreate(osThread(Reset_Sim800c_Task), NULL);
-
-	osThreadDef(Recv_Onenet_data_Task, Start_Recv_Onenet_data_Task, osPriorityNormal, 0, 128);	//创建接收数据
-	Start_Recv_Onenet_data_TaskHandle = osThreadCreate(osThread(Recv_Onenet_data_Task), NULL);	//
 
 	taskEXIT_CRITICAL();				//退出临界区
 
