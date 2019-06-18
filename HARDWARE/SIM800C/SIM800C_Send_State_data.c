@@ -12,8 +12,11 @@
 #include "relay.h"
 #include "Mqtt.h"
 #include "GPRS.h"
+#include "LCD12864.h"
 extern uint8_t g_send_Onenet_buf[];
 extern osThreadId Start_Reset_Sim800c_Task_TaskHandle;
+extern osThreadId Start_Send_State_data_TaskHandle;
+extern Delete_Task_struct G_Delete_Task_struct;//删除任务的结构体
 uint8_t g_init_send = ERROR;
 void Start_Send_State_data_Task(void const * argument)
 {
@@ -56,6 +59,10 @@ void Send_Temp_Humi_F_R(void)
 		osThreadDef(Reset_Sim800c_Task, Start_Reset_Sim800c_Task, osPriorityNormal, 0, 128);	//开启重启Sim800C初始化调度函数
 		Start_Reset_Sim800c_Task_TaskHandle = osThreadCreate(osThread(Reset_Sim800c_Task), NULL);
 		taskEXIT_CRITICAL();				//退出临界区
+		//删除自己要重新开始
+		G_Delete_Task_struct.D_Task = Start_Send_State_data_TaskHandle;
+		Start_Send_State_data_TaskHandle = NULL;
+		G_Delete_Task_struct.sign = ENABLE;
 	}
 	Pack_Len = init_OneNet_Temp_Humi_F_R_Pack();
 	Send_To_Uart2_Str((int8_t*)g_send_Onenet_buf,Pack_Len);
@@ -75,6 +82,10 @@ void Send_Temp_Humi_F_R(void)
 			osThreadDef(Reset_Sim800c_Task, Start_Reset_Sim800c_Task, osPriorityNormal, 0, 128);	//开启重启Sim800C初始化调度函数
 			Start_Reset_Sim800c_Task_TaskHandle = osThreadCreate(osThread(Reset_Sim800c_Task), NULL);
 			taskEXIT_CRITICAL();	
+			//删除自己要重新开始
+			G_Delete_Task_struct.D_Task = Start_Send_State_data_TaskHandle;
+			Start_Send_State_data_TaskHandle = NULL;
+			G_Delete_Task_struct.sign = ENABLE;
 		}
 		//return ERROR;
 	}else if((err == pdTRUE)&&(NotifyValue == RCV_SEND_OK)&&(cmp == 0)){

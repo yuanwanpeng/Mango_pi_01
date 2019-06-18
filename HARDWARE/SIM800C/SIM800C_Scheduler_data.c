@@ -119,7 +119,7 @@ void Recv_Symbol_Opt(void)
 //	printf(">G_p_index_end = %s,end_data_len = %d,err = %d\r\n",G_p_index_end,end_data_len,err);
 	if(end_data_len == 0)	//(表示OK\r\n 之后一个字节数据地址)判断是否等于0 0 表示后面没有数据
 	{
-		printf("Reset_Uart_DMA\r\n");
+//		printf("Reset_Uart_DMA\r\n");
 		Reset_Uart_DMA();
 	}//如果有数据 也没有关系，判断的时候从G_p_index_end开始判断;
 	
