@@ -18,7 +18,7 @@
 #define AT_CGATT 		"AT+CGATT=1\r\n"
 #define AT_CIPCSGP 		"AT+CIPCSGP=1,\"CMLG\"\r\n"
 #define AT_CIPSTATUS 	"AT+CIPSTATUS\r\n"
-#define AT_CIPSTART		"AT+CIPSTART=\"TCP\",\"183.230.40.39\",\"6002\"\r\n"
+#define AT_CIPSTART		"AT+CIPSTART=\"TCP\",\"182.92.0.28\",\"1883\"\r\n"
 #define AT_CSQ			"AT+CSQ\r\n"
 #define AT_CIPSEND		"AT+CIPSEND\r\n"
 #define ATE0			"ATE0\r\n"

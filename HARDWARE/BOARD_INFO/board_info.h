@@ -40,5 +40,5 @@ int8_t Check_Str_Number(uint8_t* p_Str_Number,uint8_t type);
 int8_t Check_Serial_Number(uint8_t* p_str_Serial_Number);
 int8_t Check_Date_Of_Manufacture(uint8_t* p_str_Date_Of_Manufacture);
 uint8_t Send_Version_Information(void);
-uint16_t init_OneNet_Version_Information_Pack(void);
+uint16_t init_Server_Version_Information_Pack(void);
 #endif /* HARDWARE_BOARD_INFO_BOARD_INFO_H_ */

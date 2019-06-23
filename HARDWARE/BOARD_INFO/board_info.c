@@ -16,7 +16,7 @@
 #define DEF_SERIAL_NUMBER				8
 extern uint8_t pData[];
 extern uint8_t Uart1_RxBuff[];
-extern uint8_t g_send_Onenet_buf[];
+extern uint8_t g_send_Server_buf[];
 extern UART_HandleTypeDef huart1;
 extern uint8_t Uart1_Rx_Cnt;
 extern uint8_t aRxBuffer;			//接收中断缓冲
@@ -322,7 +322,7 @@ int8_t Check_Master_Control(uint8_t* p_Master_Control)
 /*
  * 发送设备硬件版本等信息到ONENET
  */
-uint16_t init_OneNet_Version_Information_Pack(void)
+uint16_t init_Server_Version_Information_Pack(void)
 {
 	uint8_t index = 0;
 	uint8_t i = 0;
@@ -385,8 +385,8 @@ uint8_t Send_Version_Information(void)
 		Start_Reset_Sim800c_Task_TaskHandle = osThreadCreate(osThread(Reset_Sim800c_Task), NULL);
 		taskEXIT_CRITICAL();				//退出临界区
 	}
-	Pack_Len = init_OneNet_Version_Information_Pack();
-	Send_To_Uart2_Str((int8_t*)g_send_Onenet_buf,Pack_Len);
+	Pack_Len = init_Server_Version_Information_Pack();
+	Send_To_Uart2_Str((int8_t*)g_send_Server_buf,Pack_Len);
 	//需要等待返回数据返回一个SEND OK
 	err = xTaskNotifyWait((uint32_t)0x00,
 			(uint32_t)0xffffffff,

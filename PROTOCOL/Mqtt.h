@@ -59,7 +59,7 @@ extern float g_rh;
 extern uint8_t pData[];
 extern float temp;
 extern Onenet_Pack G_Send_Pack;
-uint16_t Connect_OneNet(void);
+uint16_t Connect_Server(void);
 
 uint8_t Get_Sim800C_Signal(void);
 uint16_t Create_Send_Pack(uint8_t* str);

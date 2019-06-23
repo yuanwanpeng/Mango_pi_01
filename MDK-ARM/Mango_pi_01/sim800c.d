@@ -92,3 +92,11 @@ mango_pi_01\sim800c.o: ..\HARDWARE\LCD12864\LCD12864_Display_Menu_Set_Time.h
 mango_pi_01\sim800c.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 mango_pi_01\sim800c.o: ..\HARDWARE\LCD12864\LCD12864_Display_Menu_Stroking_Cycle.h
 mango_pi_01\sim800c.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
+mango_pi_01\sim800c.o: ..\MQTT\MQTTPacket.h
+mango_pi_01\sim800c.o: ..\MQTT\MQTTConnect.h
+mango_pi_01\sim800c.o: ..\MQTT\MQTTPublish.h
+mango_pi_01\sim800c.o: ..\MQTT\MQTTSubscribe.h
+mango_pi_01\sim800c.o: ..\MQTT\MQTTUnsubscribe.h
+mango_pi_01\sim800c.o: ..\MQTT\MQTTFormat.h
+mango_pi_01\sim800c.o: ..\MQTT\StackTrace.h
+mango_pi_01\sim800c.o: ..\MQTT\MQTTPacket.h

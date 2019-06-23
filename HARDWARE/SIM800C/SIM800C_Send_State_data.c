@@ -13,7 +13,7 @@
 #include "Mqtt.h"
 #include "GPRS.h"
 #include "LCD12864.h"
-extern uint8_t g_send_Onenet_buf[];
+extern uint8_t g_send_Server_buf[];
 extern osThreadId Start_Reset_Sim800c_Task_TaskHandle;
 extern osThreadId Start_Send_State_data_TaskHandle;
 extern Delete_Task_struct G_Delete_Task_struct;//删除任务的结构体
@@ -21,9 +21,10 @@ uint8_t g_init_send = ERROR;
 void Start_Send_State_data_Task(void const * argument)
 {
 	xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//获取互斥信号量
-	Connect_OneNet();	//SIM800C重新上电后需要连接ONENET的MQTT服务器
+	Connect_Server();	//SIM800C重新上电后需要连接ONENET的MQTT服务器
+	//推送主题
 	xSemaphoreGive(Sim800c_Semaphore);
-	//连接上开机连接上ONENET之后要发送设备信息Version_Information
+	//连接上开机连接上Server之后要发送设备信息Version_Information
 	if(g_init_send==ERROR)//确定只有第一次开机时候发送设备信息
 	{
 		xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//获取互斥信号量
@@ -65,7 +66,7 @@ void Send_Temp_Humi_F_R(void)
 		G_Delete_Task_struct.sign = ENABLE;
 	}
 	Pack_Len = init_OneNet_Temp_Humi_F_R_Pack();
-	Send_To_Uart2_Str((int8_t*)g_send_Onenet_buf,Pack_Len);
+	Send_To_Uart2_Str((int8_t*)g_send_Server_buf,Pack_Len);
 	//当我等待这个SEND OK的时候不能让查询信号发出数据
 	err = xTaskNotifyWait((uint32_t)0x00,
 			(uint32_t)0xffffffff,

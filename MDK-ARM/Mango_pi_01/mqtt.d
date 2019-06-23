@@ -3,6 +3,15 @@ mango_pi_01\mqtt.o: ..\PROTOCOL\Mqtt.h
 mango_pi_01\mqtt.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 mango_pi_01\mqtt.o: ..\CJSON\cJSON.h
 mango_pi_01\mqtt.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+mango_pi_01\mqtt.o: ..\MQTT\MQTTPacket.h
+mango_pi_01\mqtt.o: ..\MQTT\MQTTConnect.h
+mango_pi_01\mqtt.o: ..\MQTT\MQTTPublish.h
+mango_pi_01\mqtt.o: ..\MQTT\MQTTSubscribe.h
+mango_pi_01\mqtt.o: ..\MQTT\MQTTUnsubscribe.h
+mango_pi_01\mqtt.o: ..\MQTT\MQTTFormat.h
+mango_pi_01\mqtt.o: ..\MQTT\StackTrace.h
+mango_pi_01\mqtt.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+mango_pi_01\mqtt.o: ..\MQTT\MQTTPacket.h
 mango_pi_01\mqtt.o: ../Inc/main.h
 mango_pi_01\mqtt.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 mango_pi_01\mqtt.o: ..\HARDWARE\BOARD_INFO\board_info.h
@@ -34,7 +43,6 @@ mango_pi_01\mqtt.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 mango_pi_01\mqtt.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 mango_pi_01\mqtt.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
 mango_pi_01\mqtt.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
-mango_pi_01\mqtt.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 mango_pi_01\mqtt.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 mango_pi_01\mqtt.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 mango_pi_01\mqtt.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h

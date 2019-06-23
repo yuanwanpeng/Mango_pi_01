@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Middlewares/Third_Party/FatFs/src;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Drivers/CMSIS/Include;..\HARDWARE\BUTTON;..\HARDWARE\BUZZER;..\HARDWARE\LCD12864;..\HARDWARE\DELAY;..\HARDWARE\RELAY;..\HARDWARE\24C0X;..\HARDWARE\HUMI;..\HARDWARE\LED;..\HARDWARE\SIM800C;..\HARDWARE\ESP8266;..\HARDWARE\AM2320;..\HARDWARE\BOARD_INFO;..\PROTOCOL;..\CJSON</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Middlewares/Third_Party/FatFs/src;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Drivers/CMSIS/Include;..\HARDWARE\BUTTON;..\HARDWARE\BUZZER;..\HARDWARE\LCD12864;..\HARDWARE\DELAY;..\HARDWARE\RELAY;..\HARDWARE\24C0X;..\HARDWARE\HUMI;..\HARDWARE\LED;..\HARDWARE\SIM800C;..\HARDWARE\ESP8266;..\HARDWARE\AM2320;..\HARDWARE\BOARD_INFO;..\PROTOCOL;..\CJSON;..\MQTT</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -781,6 +781,61 @@
               <FileName>cJSON.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\CJSON\cJSON.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>MQTT</GroupName>
+          <Files>
+            <File>
+              <FileName>MQTTConnectClient.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTConnectClient.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTConnectServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTConnectServer.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTDeserializePublish.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTDeserializePublish.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTFormat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTFormat.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTPacket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTPacket.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTSerializePublish.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTSerializePublish.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTSubscribeClient.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTSubscribeClient.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTSubscribeServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTSubscribeServer.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTUnsubscribeClient.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTUnsubscribeClient.c</FilePath>
+            </File>
+            <File>
+              <FileName>MQTTUnsubscribeServer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MQTT\MQTTUnsubscribeServer.c</FilePath>
             </File>
           </Files>
         </Group>

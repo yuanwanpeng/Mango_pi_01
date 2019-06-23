@@ -1,0 +1,11 @@
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTUnsubscribeServer.c
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTPacket.h
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTConnect.h
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTPublish.h
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTSubscribe.h
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTUnsubscribe.h
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTFormat.h
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\StackTrace.h
+mango_pi_01\mqttunsubscribeserver.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+mango_pi_01\mqttunsubscribeserver.o: ..\MQTT\MQTTPacket.h
+mango_pi_01\mqttunsubscribeserver.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

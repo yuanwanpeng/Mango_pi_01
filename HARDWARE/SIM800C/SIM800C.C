@@ -14,7 +14,7 @@
 #include "board_info.h"
 #include "SIM800C_Scheduler_data.h"
 #include "LCD12864.h"
-//#include "stm32f1xx_hal_dma.h"
+#include "MQTTPacket.h"
 
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;

@@ -1,0 +1,11 @@
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTSerializePublish.c
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTPacket.h
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTConnect.h
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTPublish.h
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTSubscribe.h
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTUnsubscribe.h
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTFormat.h
+mango_pi_01\mqttserializepublish.o: ..\MQTT\StackTrace.h
+mango_pi_01\mqttserializepublish.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+mango_pi_01\mqttserializepublish.o: ..\MQTT\MQTTPacket.h
+mango_pi_01\mqttserializepublish.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

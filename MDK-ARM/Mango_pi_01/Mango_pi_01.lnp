@@ -71,6 +71,16 @@
 "mango_pi_01\sim800c_recv_onenet_data.o"
 "mango_pi_01\mqtt.o"
 "mango_pi_01\cjson.o"
+"mango_pi_01\mqttconnectclient.o"
+"mango_pi_01\mqttconnectserver.o"
+"mango_pi_01\mqttdeserializepublish.o"
+"mango_pi_01\mqttformat.o"
+"mango_pi_01\mqttpacket.o"
+"mango_pi_01\mqttserializepublish.o"
+"mango_pi_01\mqttsubscribeclient.o"
+"mango_pi_01\mqttsubscribeserver.o"
+"mango_pi_01\mqttunsubscribeclient.o"
+"mango_pi_01\mqttunsubscribeserver.o"
 --library_type=microlib --strict --scatter "Mango_pi_01\Mango_pi_01.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

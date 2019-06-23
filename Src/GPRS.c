@@ -72,6 +72,7 @@ uint8_t GPRS_AT_CIPSTATUS(uint8_t* cmd,uint8_t* check)
 uint8_t GPRS_AT_CIPSTART(uint8_t* cmd,uint8_t* check)
 {
 	Send_To_Uart2_Str(AT_CIPSTART,strlen(AT_CIPSTART));
+	printf("GPRS_AT_CIPSTART = %s",AT_CIPSTART);
 	osDelay(1000);
 	while(strstr((const char *)pData,check) == NULL)//没有数据返回
 	{
