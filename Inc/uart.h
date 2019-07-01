@@ -15,7 +15,7 @@
 #include "SIM800c.h"
 //#include "dma.h"
 #define MAX_RECV_LEN 256
-
+#define PDATA_SIZE 256
 
 
 extern SemaphoreHandle_t xSemaphore;

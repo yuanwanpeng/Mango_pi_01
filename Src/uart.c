@@ -8,7 +8,7 @@
 #include <stdarg.h>
 #include "cmsis_os.h"
 #include "semphr.h"
-#define PDATA_SIZE 256
+
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 

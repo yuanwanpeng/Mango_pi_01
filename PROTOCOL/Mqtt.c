@@ -9,10 +9,13 @@
 #include "main.h"
 #include "GPRS.h"
 #include "SIM800C_Scheduler_data.h"
+#include "transport.h"
 #define DEVICE_ID 	"518898092"
 #define PRODUCT_ID 	"217490"
 #define API_KEY		"eC8obJLJaS2PEA0SSrF3gcGbDQ8="
 extern uint8_t pData[];
+extern DMA_HandleTypeDef hdma_usart2_tx;
+extern DMA_HandleTypeDef hdma_usart2_rx;
 Connect_Pack G_Connect_Pack;
 Onenet_Pack G_Send_Pack;
 uint8_t g_send_Server_buf[1024];
@@ -24,19 +27,33 @@ uint16_t MQTT_Connect(void)
 	int len = 0;
 	MQTTPacket_connectData ConnectData = MQTTPacket_connectData_initializer;
 
-	ConnectData.clientID.cstring = "yuanwanpeng";
+	ConnectData.clientID.cstring = "Mango_pi_01";
 	ConnectData.keepAliveInterval = 360;
 	ConnectData.cleansession = 1;
-	ConnectData.username.cstring = "";
-	ConnectData.password.cstring = "";
+	ConnectData.username.cstring = NULL;
+	ConnectData.password.cstring = NULL;
 
 	len = MQTTSerialize_connect(g_send_Server_buf, 1024, &ConnectData);
+	g_send_Server_buf[len] = 0x1A;
 	printf("g_send_Server = %s,len = %d\r\n",g_send_Server_buf,len);
 
-	Send_To_Uart2_Str((int8_t*)g_send_Server_buf,Pack_Len);
-	if (transport_sendPacketBuffer(g_send_Server_buf,len,ACK))
+//	Send_To_Uart2_Str((int8_t*)g_send_Server_buf,Pack_Len);
+	osDelay(500);
+	printf("len = %d\r\n",len);
+	if (transport_sendPacketBuffer(g_send_Server_buf,len))
 	{
+		len = __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);
+ 		len = PDATA_SIZE - len;
+		printf("dat len = %d\r\n",len);
+//		p_GPRS->DOWN_LEN = 0x0000;
+//		if (MQTTPacket_read(g_send_Server_buf, Size, transport_getdata) == CONNACK)
+//		{
+//			unsigned char sessionPresent, connack_rc;
+//			if (MQTTDeserialize_connack(&sessionPresent, &connack_rc, IOT_Buf, Size) != 1 || connack_rc != 0)
+//				return ERROR;
 
+//			else return SUCCESS;
+//		}
 	}
 
 	osDelay(100);

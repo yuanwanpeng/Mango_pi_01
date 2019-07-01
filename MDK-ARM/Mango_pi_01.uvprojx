@@ -772,6 +772,11 @@
               <FileType>1</FileType>
               <FilePath>..\PROTOCOL\Mqtt.c</FilePath>
             </File>
+            <File>
+              <FileName>transport.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PROTOCOL\transport.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
