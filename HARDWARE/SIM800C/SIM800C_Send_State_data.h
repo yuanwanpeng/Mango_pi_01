@@ -14,5 +14,5 @@
 
 void Start_Send_State_data_Task(void const * argument);
 void Send_Temp_Humi_F_R(void);
-uint16_t init_OneNet_Temp_Humi_F_R_Pack(void);
+char* init_Temp_Humi_F_R_Pack(void);
 #endif /* HARDWARE_SIM800C_SIM800C_SEND_STATE_DATA_H_ */

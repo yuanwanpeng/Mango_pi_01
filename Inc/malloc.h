@@ -1,7 +1,7 @@
 #ifndef __MALLOC_H
 #define __MALLOC_H
 #include "stm32f10x.h"
-  
+#include "core_cm3.h"
 #ifndef NULL
 #define NULL 0
 #endif

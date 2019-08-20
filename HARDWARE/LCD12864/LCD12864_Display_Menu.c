@@ -14,7 +14,8 @@
 #include "LCD12864_Display_Menu_Route_Reset.h"
 #include "LCD12864_Display_Menu_Stroking_Cycle.h"
 #include "LCD12864_Display_Menu_Set_Strategy_Info.h"
-extern uint8_t G_Sim800C_Signal;
+extern	GPRS_TypeDef						*p_GPRS;
+//extern uint8_t G_Sim800C_Signal;
 /*
  * 点击选择后比如行程归零点击进入后将行程归零四个字改成白底
  * */
@@ -284,7 +285,7 @@ void LCD12864_Display_Menu(uint8_t key)
 			page = 0;
 			LCD12864_Display(0x00,0x00);
 			LCD12864_Put_Str_At_Present_Mode(G_New_Mode);
-			LCD12864_Put_Signel_Sim(G_Sim800C_Signal);
+			LCD12864_Put_Signel_Sim(p_GPRS->CSQ/*G_Sim800C_Signal*/);
 //			LCD12864_Put_Signel_Wifi();
 			LCD12864_Put_Motor_Situation(1);
 			LCD12864_Put_Open_Mouth_And_Time();

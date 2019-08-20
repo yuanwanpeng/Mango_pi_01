@@ -14,7 +14,7 @@
 #define DEF_DEVICE_ID_LEN 				9
 #define DEF_DATE_OF_MANUFACTURE_LEN		6
 #define DEF_SERIAL_NUMBER				8
-extern uint8_t pData[];
+
 extern uint8_t Uart1_RxBuff[];
 extern uint8_t g_send_Server_buf[];
 extern UART_HandleTypeDef huart1;
@@ -22,7 +22,7 @@ extern uint8_t Uart1_Rx_Cnt;
 extern uint8_t aRxBuffer;			//接收中断缓冲
 Version_Information_Struct G_Version_Information;
 extern osThreadId Start_Reset_Sim800c_Task_TaskHandle;
-extern Onenet_Pack G_Send_Pack;
+extern MQTT_Send_Pack G_Send_Pack;
 //Version_Information_Pack G_Version_Information_Pack;
 //typedef struct{
 //	uint8_t Master_Control;			//主控类型 	交流卷膜，直流卷膜，但接触器（风机），双接触器（棉被），数据采集器
@@ -33,6 +33,17 @@ extern Onenet_Pack G_Send_Pack;
 //	uint8_t Date_Of_Manufacture[6];	//生产日期
 //	uint8_t Serial_Number[10];		//流水号4个字节
 //}Version_Information_Struct;
+
+/*
+*/
+char* Make_Board_Info(Version_Information_Struct* p_Version_Information)
+{
+	cJSON * root =  cJSON_CreateObject();
+  cJSON * item;
+	char *payload;
+	
+}
+
 
 /*
  * 		板子信息检查函数
@@ -52,7 +63,7 @@ int8_t Check_Board_Info(void)
 	i += Check_Serial_Number(G_Version_Information.Serial_Number);
 	if(i!=0)
 	{
-		printf("write board_info\r\n");
+//		printf("write board_info\r\n");
 		AT24CXX_Write(VERSION_INFORMATION_ADDR,(uint8_t*)(&G_Version_Information),sizeof(G_Version_Information));	//写入板子信息
 	}
 	
@@ -325,15 +336,11 @@ int8_t Check_Master_Control(uint8_t* p_Master_Control)
 uint16_t init_Server_Version_Information_Pack(void)
 {
 	uint8_t index = 0;
-	uint8_t i = 0;
+	uint8_t i = 0,flag;
 	uint32_t pack_len=0;
 	uint8_t str[16];
-	unsigned long encodedByte;
-	G_Send_Pack.Pack_type = 0x30;
-	G_Send_Pack.TopicNameLen = 0x0003;
-	memcpy(G_Send_Pack.TopicName,"$dp",strlen("$dp"));
-	G_Send_Pack.DpType = 0x03;
-	G_Send_Pack.JsonStr = cJSON_CreateObject();
+	
+	G_Send_Pack.JsonStr = cJSON_CreateObject();//申请了内存
 	if(!G_Send_Pack.JsonStr){
 		printf("get root faild !\r\n");
 	}
@@ -349,55 +356,22 @@ uint16_t init_Server_Version_Information_Pack(void)
 	cJSON_AddStringToObject(G_Send_Pack.JsonStr,"Date_Of_Manufacture",(const char*)G_Version_Information.Date_Of_Manufacture);
 	cJSON_AddStringToObject(G_Send_Pack.JsonStr,"Serial_Number",(const char*)G_Version_Information.Serial_Number);
 	char* s;
-	s = cJSON_PrintUnformatted(G_Send_Pack.JsonStr);
-	pack_len = strlen((const char*)s)+8;
-	memset(G_Send_Pack.RemainedLength,'\0',4);
-	do{
-		 encodedByte = pack_len % 128;
-		 pack_len = pack_len / 128;
-		 if(pack_len > 0){
-			 encodedByte = encodedByte | 128;
-		 }
-		 G_Send_Pack.RemainedLength[i++] =  (unsigned char)encodedByte;
-	}while(pack_len);
-	s = cJSON_PrintUnformatted(G_Send_Pack.JsonStr);
-
-	index = Create_Send_Pack(s);
+	s = cJSON_PrintUnformatted(G_Send_Pack.JsonStr);//非格式化打印JSON这就是发送的数据
+	flag = MQTT_Pubtopic(TOPIC_SendData,s);//发送JSON数据
 	
+	cJSON_Delete(G_Send_Pack.JsonStr);
 	return index;
 }
 /*
- * 上传版本信息，上电上传
+ * 	上传版本信息，上电上传
+ * 	flag = MQTT_Pubtopic(TOPIC_SendData,"BOARD SEND DATA...");
  */
 uint8_t Send_Version_Information(void)
 {
-	BaseType_t err = 1;
-	uint32_t NotifyValue;
 	uint16_t Pack_Len;
-	uint8_t cmp;
-	Reset_Uart_DMA();
-	while(GPRS_AT_CIPSEND(AT_CIPSEND,">")==ERROR)
-	{
-		printf("Send_Version_Information AT_CIPSEND reset\r\n");
-		xSemaphoreGive(Sim800c_Semaphore);
-		taskENTER_CRITICAL();				//进入临界区
-		osThreadDef(Reset_Sim800c_Task, Start_Reset_Sim800c_Task, osPriorityNormal, 0, 128);	//开启重启Sim800C初始化调度函数
-		Start_Reset_Sim800c_Task_TaskHandle = osThreadCreate(osThread(Reset_Sim800c_Task), NULL);
-		taskEXIT_CRITICAL();				//退出临界区
-	}
+
 	Pack_Len = init_Server_Version_Information_Pack();
-	Send_To_Uart2_Str((int8_t*)g_send_Server_buf,Pack_Len);
-	//需要等待返回数据返回一个SEND OK
-	err = xTaskNotifyWait((uint32_t)0x00,
-			(uint32_t)0xffffffff,
-			(uint32_t*)&NotifyValue,
-			(TickType_t)10000);
-	cmp = strcmp(Send_data_recv,"\r\nSEND OK\r\n");//对比是不是这个数据
-	if(err == pdFALSE){
-		return ERROR;
-	}else if((err == pdTRUE)&&(NotifyValue == RCV_SEND_OK)&&(cmp == 0)){
-		return SUCCESS;
-	}
+	
 }
 
 

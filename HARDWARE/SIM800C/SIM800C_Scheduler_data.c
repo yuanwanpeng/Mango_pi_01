@@ -8,206 +8,254 @@
 #include "SIM800C_Scheduler_data.h"
 #include <string.h>
 #include "SIM800C.h"
-extern uint8_t pData[];
-extern uint8_t G_Sim800C_Signal;
-extern char Send_data_recv[];
+
+#define CMP_AT 							(strstr(_GPRS->P_CMD, "AT\r\n"))
+#define CMP_ATE0						(strstr(_GPRS->P_CMD, "ATE0\r\n"))
+#define CMP_AT_CIPSRIP			(strstr(_GPRS->P_CMD, "AT+CIPSRIP=1\r\n"))
+#define CMP_AT_CSQ					(strstr(_GPRS->P_CMD, "AT+CSQ\r\n"))
+#define CMP_AT_CIPCLOSE			(strstr(_GPRS->P_CMD, "AT+CIPCLOSE\r\n"))	
+#define CMP_AT_CIPSTART			(strstr(_GPRS->P_CMD, "AT+CIPSTART"))	
+#define CMP_AT_CIPSTATUS		(strstr(_GPRS->P_CMD, "AT+CIPSTATUS\r\n"))
+#define CMP_AT_CIPSHUT			(strstr(_GPRS->P_CMD, "AT+CIPSHUT\r\n"))
+#define CMP_AT_CGDCONT			(strstr(_GPRS->P_CMD, "AT+CGDCONT="))
+
+#define CMP_AT_CIPSEND			(strstr(_GPRS->P_CMD, "AT+CIPSEND="))	
+#define CMP_AT_CSMINS				(strstr(_GPRS->P_CMD, "AT+CSMINS?"))
+
+#define DAT_MQTT_DAT				(strstr(_GPRS->P_CMD, "MQTT_DAT"))
+#define RECV_MQTT_DAT				(strstr(_GPRS->P_CMD, "RECV"))
+
+
+
+extern char * GPRS_Rx_Dat;
+//extern uint8_t G_Sim800C_Signal;
 extern uint8_t Recv_cmd_data[];
+extern SemaphoreHandle_t uart2_Idle_xSemaphore;
 extern osThreadId Start_Scheduler_data_Task_TaskHandle;
 extern osThreadId Start_Send_State_data_TaskHandle;	//发送数据到上位机句柄
 extern osThreadId Start_Recv_Onenet_data_TaskHandle;	//接收数据到上位机句柄
-char *G_p_index_start = pData,*G_p_index_end = pData;			//表示一帧数据的前和尾
+extern GPRS_TypeDef *p_GPRS,GPRS;
+extern DMA_HandleTypeDef hdma_usart2_rx;
+extern SemaphoreHandle_t recv_gprs_cmd_xSemaphore;//二值信号量
+extern SemaphoreHandle_t send_gprs_dat_xSemaphore;//二值信号量
 
-/*
- *接收到SEND OK\r\n 操作
- */
-void Recv_SEND_OK_Opt(void)
-{
-	BaseType_t err;
-	memset(Send_data_recv,'\0',32);
-	strcpy(Send_data_recv,"\r\nSEND OK\r\n");
-	
-	taskENTER_CRITICAL();				//进入临界区
-	G_p_index_start = strstr((const char*)G_p_index_end,"\r\nSEND OK\r\n");
-	if(G_p_index_end < pData)
-	{
-		printf("Recv_SEND_OK_Opt =addr= 0x04");
-	}
-	G_p_index_end = strstr((const char*)G_p_index_end,"\r\nSEND OK\r\n");
-	if(G_p_index_end < pData)
-	{
-		printf("Recv_SEND_OK_Opt =addr= 0x04");
-	}
-	/*检查后面有没有数据*/
-	uint8_t end_data_len;	//结尾后的数据长度
-	G_p_index_end += (strlen("\r\nSEND OK\r\n"));	//最后一个字节\r\nSEND OK\r\n_这个底杠位置
-	end_data_len = strlen((const char*)G_p_index_end);			//判断底杠后面有没有数据
-	
-	
-	if(Start_Send_State_data_TaskHandle != NULL)
-	{
-		err = xTaskNotify((TaskHandle_t)Start_Send_State_data_TaskHandle,
-			(uint32_t)RCV_SEND_OK,
-			(eNotifyAction)eSetValueWithOverwrite);//发送SEND OK信号
-	}
-	if(end_data_len == 0)	//(=0表示OK\r\n 之后一个字节数据地址)判断是否等于0 0 表示后面没有数据
-	{
-		Reset_Uart_DMA();
-	}//如果有数据 也没有关系，判断的时候从G_p_index_end开始判断;
-	taskEXIT_CRITICAL();				//退出临界区
-}
-/*
- * 接收到信号强度信号操作
- */
-void Recv_CSQ_Opt(void)
-{
-	char *str = strstr((const char*)G_p_index_end,"\r\n+CSQ: ");//如果是信号信息
-	G_Sim800C_Signal = atoi(str+7);
-//	free(str);
-//	xTaskNotify((TaskHandle_t)Start_SIM800C_TaskHandle,//发送至主任务线程
-//		(uint32_t)RCV_OK,
-//		(eNotifyAction)eSetValueWithOverwrite);
-	taskENTER_CRITICAL();				//进入临界区
-	G_p_index_start = strstr((const char*)G_p_index_end,"\r\n+CSQ: ");
-	G_p_index_end = strstr((const char*)G_p_index_end,"OK\r\n");
-
-//	if(p_index == pData)//判断"\r\n+CSQ:"的首地址知否是pData，相等表示坐标一样是第一个字节
-//	{
-//		memset(pData+p_index,"\0",p_index);
-//	}
-	/*检查后面有没有数据*/
-	uint8_t end_data_len;	//结尾后的数据长度
-//	printf("G_p_index_end = %s\r\n",G_p_index_end);
-	G_p_index_end += (strlen("OK\r\n")+1);	//最后一个字节OK\r\n_这个底杠位置
-	end_data_len = strlen((const char*)G_p_index_end);	//判断底杠后面有没有数据
-//	printf("end_data_len = %d,G_p_index_end = %s,strlen = %d\r\n",end_data_len,G_p_index_end,(strlen("OK\r\n")+1));
-	
-	if(end_data_len == 0)	//(表示OK\r\n 之后一个字节数据地址)判断是否等于0 0 表示后面没有数据
-	{
-//		printf("Recv_CSQ_Opt Reset_Uart_DMA\r\n");
-		Reset_Uart_DMA();
-	}//如果有数据 也没有关系，判断的时候从G_p_index_end开始判断;
-	taskEXIT_CRITICAL();				//退出临界区
-}
-/*
- *	\r\n> 符号操作
- */
-void Recv_Symbol_Opt(void)
-{
-	BaseType_t err;
-	char *str;
-	memset(Send_data_recv,'\0',128);
-	strcpy(Send_data_recv,">");
-	taskENTER_CRITICAL();				//进入临界区
-	G_p_index_start = strstr((const char*)G_p_index_end,"\r\n>");
-		if(G_p_index_end < pData)
-	{
-		printf("Recv_Symbol_Opt =addr= 0x04");
-	}
-	G_p_index_end = strstr((const char*)G_p_index_end,"\r\n> ");
-	if(G_p_index_end < pData)
-	{
-		printf("Recv_Symbol_Opt =addr= 0x04");
-	}
-	/*检查后面有没有数据*/
-	uint8_t end_data_len;	//结尾后的数据长度
-	G_p_index_end += (strlen("\r\n> "));	//最后一个字节OK\r\n_这个底杠位置
-	end_data_len = strlen((const char*)G_p_index_end);	//判断底杠后面有没有数据
-	
-	err = xTaskNotify((TaskHandle_t)Start_Send_State_data_TaskHandle,//发送至主任务线程
-		(uint32_t)RCV_WRITE_SYMBEL,
-		(eNotifyAction)eSetValueWithOverwrite);
-//	printf(">G_p_index_end = %s,end_data_len = %d,err = %d\r\n",G_p_index_end,end_data_len,err);
-	if(end_data_len == 0)	//(表示OK\r\n 之后一个字节数据地址)判断是否等于0 0 表示后面没有数据
-	{
-//		printf("Reset_Uart_DMA\r\n");
-		Reset_Uart_DMA();
-	}//如果有数据 也没有关系，判断的时候从G_p_index_end开始判断;
-	
-	taskEXIT_CRITICAL();				//退出临界区
-}
-/*
- *  接收到了数据'0'开头
- */
-void Recv_Data_Opt(void)
-{
-	//检测数据进行抛弃
-	uint8_t i = 0;
-	uint32_t encodedByte;
-	uint8_t check_len = strlen(G_p_index_end+1);//检查使用几个字节得出数据长度最长4字节
-	uint8_t mqtt_len[4] = {0x00,0x00,0x00,0x00};
-	uint16_t TopicNameLen = 0x0000;
-	if(check_len<=4){
-		strcpy((char*)mqtt_len,(const char*)(G_p_index_end+1));
-		uint32_t multiplier = 1;
-		uint32_t value = 0;
-		do{
-			encodedByte = mqtt_len[i++];
-			value += (encodedByte & 127) * multiplier;
-			multiplier *= 128;
-			if (multiplier > 128*128*128)
-				break;
-		}while ((encodedByte & 128) != 0);
-		printf("value = %d\r\n",value);//数据长度
-		TopicNameLen |= (G_p_index_end[check_len+1]<<8);	//第一位
-		TopicNameLen |= G_p_index_end[check_len+2];			//第二位
-		printf("TopicNameLen = %d\r\n",TopicNameLen);
-	//	printf("rcv_dat = %s\r\n",(pData+1+check_len+2+TopicNameLen));
-		strcpy(Recv_cmd_data,(const char*)(G_p_index_end+1+check_len+2+TopicNameLen));
-		G_p_index_end += strlen((const char*)(G_p_index_end+1+check_len+2+TopicNameLen))+1;//更改指针下标到最后一个字节的下一个字节
-		//root = cJSON_Parse((const char*)(pData+1+check_len+2+TopicNameLen));
-		xTaskNotify((TaskHandle_t)Start_Recv_Onenet_data_TaskHandle,
-					(uint32_t)RCV_CMD_DAT,
-					(eNotifyAction)eSetValueWithOverwrite);
-
-		uint8_t end_data_len = strlen((const char*)G_p_index_end);	//判断底杠后面有没有数据
-
-		taskENTER_CRITICAL();				//进入临界区
-		if(end_data_len == 0)	//(表示OK\r\n 之后一个字节数据地址)判断是否等于0 0 表示后面没有数据
-		{
-			Reset_Uart_DMA();
-		}//如果有数据 也没有关系，判断的时候从G_p_index_end开始判断;
-		taskEXIT_CRITICAL();				//退出临界区
-	}else{
-	}
-}
 /*
  * 解析sim800C返回数据的task
  */
 void Start_Scheduler_data_Task(void const * argument)
 {
-	char *str;
-	Reset_Uart_DMA();
+	
 	while(1)
 	{
-		//监控pData数据  G_p_index_end指针永远指向一帧处理完数据的在以后一个字节
-		if(strstr((const char *)G_p_index_end,"OK\r\n"))	//接收到了OK
+		if( xSemaphoreTake( uart2_Idle_xSemaphore, portMAX_DELAY ) == pdTRUE )
 		{
-			str = strstr((const char*)G_p_index_end,"\r\n+CSQ: ");//如果是信号信息
-			if(str != NULL)
-			{
-				printf("into csq = %s\r\n",G_p_index_end);
-				Recv_CSQ_Opt();			//接收到信号强度信号操作
-			}
-			str = strstr((const char*)G_p_index_end,"\r\nSEND OK\r\n");//如果是信号信息
-			if(str != NULL)
-			{
-				Recv_SEND_OK_Opt();		//接收到SEND OK操作
-			}
-		}
-		if(strstr((const char*)G_p_index_end,"\r\n> "))//返回了>符号
-		{
-			//printf("pData> = %s\r\n",pData);
-			str = strstr((const char*)G_p_index_end,"\r\n> ");//如果是待发送符号信息
-			if(str != NULL)
-			{
-				Recv_Symbol_Opt();
-			}
-		}
-		if(G_p_index_end[0] == '0')//0x30开头
-		{
-			Recv_Data_Opt();
+			Process_USART2_Dat(p_GPRS);//确认一帧数据接收完成需要判断数据是什么		
 		}
 	}
 }
+
+uint8_t Auto_Return_Data(GPRS_TypeDef	* _GPRS)
+{
+	uint8_t clear = 0;
+	if(strstr(GPRS_Rx_Dat,"+CFUN: 1"))
+	{
+		clear = 1;
+		_GPRS->CFUN = 1;
+	}
+	if(strstr(GPRS_Rx_Dat,"+CPIN: READY"))
+	{
+		clear = 2;
+		_GPRS->CPIN = 1;
+	}
+	if(strstr(GPRS_Rx_Dat,"Call Ready"))
+	{
+		clear = 3;
+		_GPRS->CALL = 1;
+	}
+	if(strstr(GPRS_Rx_Dat,"SMS Ready"))
+	{
+		clear = 4;
+		_GPRS->SMS = 1;
+	}
+	if(_GPRS->P_CMD == NULL)//当没有发送命令
+	{
+		if(strstr(GPRS_Rx_Dat,"CLOSED"))//自动返回了个CLOSED
+		{
+			printf("close\r\n");
+			clear = 5;
+			_GPRS->CIPSTATUS = 8;	//设置当前状态为CLOSED
+		}
+	}
+	if(clear != 0)
+	{
+		Clear_Recv_Data();
+	}
+	return clear;
+}
+
+void Process_USART2_Dat(GPRS_TypeDef	* _GPRS)
+{
+	BaseType_t xHigherPriorityTaskWoken;
+
+
+	HAL_UART_DMAStop(&huart2);		//关闭制定的DMA通道x,以免打扰
+	GPRS_Rx_Dat = &_GPRS->GPRS_BUF->Buf[_GPRS->GPRS_BUF->Bufuse][0];
+	_GPRS->GPRS_BUF->Len[_GPRS->GPRS_BUF->Bufuse] = PDATA_SIZE - __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);//获取接收到的数据的长度
+	_GPRS->GPRS_BUF->Bufuse = !_GPRS->GPRS_BUF->Bufuse;					//切换缓冲区BUFF
+	HAL_UART_Receive_DMA(&huart2, _GPRS->GPRS_BUF->Buf[_GPRS->GPRS_BUF->Bufuse], PDATA_SIZE);//DMA接收开启
+
+	if(Auto_Return_Data(_GPRS) != 0)	//判断自动返回的数据不等于0 表示为自动返回数据不必下面code处理
+	{
+		return;
+	}
+
+	if(CMP_AT_CIPSEND)		//等待发送数据命令
+	{
+		//printf("[%s]",GPRS_Rx_Dat);
+		if(strstr(GPRS_Rx_Dat,_GPRS->P_CMD_CHECK))	//>\r\n
+		{
+			_GPRS->ATCIPSEND = 1;
+		//	xSemaphoreGiveFromISR(recv_gprs_cmd_xSemaphore,&xHigherPriorityTaskWoken);
+		//	xSemaphoreGiveFromISR(send_gprs_dat_xSemaphore,&xHigherPriorityTaskWoken);
+			return;
+		}
+	}
+	if(CMP_AT_CSMINS)		//命令
+	{
+		printf("[%s]",GPRS_Rx_Dat);
+		if(strstr(GPRS_Rx_Dat,_GPRS->P_CMD_CHECK))	//+CSMINS:
+		{
+			_GPRS->ATCSMINS = 1;
+		//	xSemaphoreGiveFromISR(recv_gprs_cmd_xSemaphore,&xHigherPriorityTaskWoken);
+		//	xSemaphoreGiveFromISR(send_gprs_dat_xSemaphore,&xHigherPriorityTaskWoken);
+			return;
+		}
+	}
+	if(DAT_MQTT_DAT)
+	{
+		if(strstr(GPRS_Rx_Dat,_GPRS->P_CMD_CHECK))	//SEND OK\r\n
+		{
+			_GPRS->SEND_OK = 1;
+			//xSemaphoreGiveFromISR(send_gprs_dat_xSemaphore,&xHigherPriorityTaskWoken);
+			return;
+		}
+	}
+	if (CMP_AT_CIPSTATUS)//查询TCP状态
+	{
+		if(CHECK_NUM_0)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 0;
+		if(CHECK_NUM_1)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 1;
+		if(CHECK_NUM_2)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 2;
+		if(CHECK_NUM_3)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 3;
+		if(CHECK_NUM_4)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 4;
+		if(CHECK_NUM_5)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 5;
+		if(CHECK_NUM_6)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 6;
+		if(CHECK_NUM_7)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 7;
+		if(CHECK_NUM_8)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 8;
+		if(CHECK_NUM_9)		//表示可以连接数据
+			_GPRS->CIPSTATUS = 9;
+		_GPRS->ATCIPSTATUS = 1;
+		//xSemaphoreGiveFromISR(recv_gprs_cmd_xSemaphore,&xHigherPriorityTaskWoken);
+		return;
+	}
+	if (CMP_AT_CIPSHUT||CMP_AT_CGDCONT)
+	{
+		if(strstr(GPRS_Rx_Dat,"OK\r\n"))
+		{
+			xSemaphoreGiveFromISR(recv_gprs_cmd_xSemaphore,&xHigherPriorityTaskWoken);
+//			taskEXIT_CRITICAL();			//退出临界区
+			return;
+		}
+	}
+	
+
+	if(CMP_AT_CIPSTART)	//等待CONNECT OK
+	{
+		if(strstr(GPRS_Rx_Dat,"CONNECT OK\r\n"))
+		{
+			_GPRS->CIPSTATUS = 8;
+			//xSemaphoreGiveFromISR(recv_gprs_cmd_xSemaphore,&xHigherPriorityTaskWoken);
+			return;
+		}
+	}
+	
+	
+	if(RECV_MQTT_DAT)	//RECV
+	{
+		if(strstr(GPRS_Rx_Dat,_GPRS->P_CMD_CHECK))	//RECV FROM
+		{
+			xSemaphoreGiveFromISR(send_gprs_dat_xSemaphore,&xHigherPriorityTaskWoken);
+			return;
+		}
+	}	
+	if(CMP_AT)
+	{
+		if(strstr(GPRS_Rx_Dat,"OK\r\n"))
+		{
+			_GPRS->AT = 1;
+			return;
+		}
+	}
+	if(CMP_ATE0)
+	{
+		if(strstr(GPRS_Rx_Dat,"OK\r\n"))
+		{
+			_GPRS->ATE = 1;
+			return;
+		}
+	}
+	if(CMP_AT_CIPSRIP)
+	{
+		if(strstr(GPRS_Rx_Dat,"OK\r\n"))
+		{
+			_GPRS->CIPSRIP = 1;
+			return;
+		}
+	}
+	if (CMP_AT_CSQ)
+	{
+		if(strstr(GPRS_Rx_Dat,"OK\r\n"))
+		{
+			_GPRS->ATCSQ = 1;
+			return;
+		}
+	}
+	if(CMP_AT_CIPCLOSE)//CIPCLOSE
+	{
+		if(strstr(GPRS_Rx_Dat,"ERROR\r\n"))
+		{
+			_GPRS->CIPCLOSE = 1;
+			return;
+		}
+	}
+	
+	//printf("GPRS_Rx_Dat = [%s]",GPRS_Rx_Dat);//打印出没有能力解析的数据
+	//	if (strstr(GPRS_Rx_Dat,"SMS Ready\r\n"))
+//		_GPRS->READY++;
+	Clear_Recv_Data();
+}
+
+void Clear_Recv_Data(void)
+{
+	memcpy(p_GPRS->DOWN_BUF,p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose],p_GPRS->GPRS_BUF->Len[p_GPRS->GPRS_BUF->RX_Dispose]);
+	(p_GPRS->DOWN_BUF[p_GPRS->GPRS_BUF->Len[p_GPRS->GPRS_BUF->RX_Dispose] + 1])  = '\0';//将最后一个数据赋值为0
+	memset(p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose],'\0',strlen(p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose]));//清空数据
+	//p_GPRS->GPRS_BUF->Buf[_GPRS->GPRS_BUF->RX_Dispose]这里面的数据处理完毕
+	p_GPRS->GPRS_BUF->RX_Dispose = !p_GPRS->GPRS_BUF->RX_Dispose;//切换待处理的缓冲区指针
+}
+
+
+
+
+
+
 
 

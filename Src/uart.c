@@ -14,7 +14,6 @@ extern UART_HandleTypeDef huart2;
 
 void USARTx_Printf(UART_HandleTypeDef* huartx, char *Data,...);
 
-uint8_t pData[PDATA_SIZE];
 uint8_t aRxBuffer;			//接收中断缓冲
 uint8_t Uart1_RxBuff[64];		//接收缓冲
 uint8_t Uart1_Rx_Cnt = 0;		//接收缓冲计数
@@ -23,33 +22,40 @@ uint8_t	cAlmStr[] = "数据溢出(大于256)\r\n";
 uint8_t a2RxBuffer;			//接收中断缓冲
 uint8_t Uart2_RxBuff[MAX_RECV_LEN];		//接收缓冲
 uint8_t Uart2_Rx_Cnt = 0;		//接收缓冲计数
-extern uint8_t *G_p_index_start,*G_p_index_end;
-
-void Reset_Uart_DMA(void)
-{
-	HAL_UART_DMAStop(&huart2);
-	memset(pData,'\0',PDATA_SIZE);
-	HAL_UART_Receive_DMA(&huart2, pData, PDATA_SIZE);
-	G_p_index_start = pData;
-	G_p_index_end = pData;
-}
-
+extern GPRS_TypeDef							*p_GPRS,GPRS;
+extern SemaphoreHandle_t uart2_Idle_xSemaphore;
 
 /*
  *     串口2发送
  */
 void Send_To_Uart2_Str(int8_t* str,uint32_t len)
 {	
+//	xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//获取二值信号量在发送的时候不允许别的任务调用发送
 	while(HAL_UART_Transmit_DMA(&huart2, (uint8_t*)str, len) != HAL_OK)
 	{
 		osDelay(100);
 	}
-	osDelay(100);
+//	xSemaphoreGive(Sim800c_Semaphore);//释放二值信号量
 }
 
 
-
-
+void UART_IDLE_Callback(UART_HandleTypeDef *huart)
+{
+	BaseType_t xHigherPriorityTaskWoken;
+	uint32_t tmp1, tmp2;
+	tmp1 = __HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE);
+	tmp2 = __HAL_UART_GET_IT_SOURCE(huart, UART_IT_IDLE);
+	if((tmp1 != RESET) && (tmp2 != RESET))
+	{
+		__HAL_UART_CLEAR_IDLEFLAG(huart);
+		huart->gState = HAL_UART_STATE_READY;
+		p_GPRS->GPRS_BUF->Clear = (uint32_t)(&huart->Instance->SR);
+		p_GPRS->GPRS_BUF->Clear = (uint32_t)(&huart->Instance->DR);
+		p_GPRS->GPRS_BUF->RX_Flag = SET;//置位接收数据标志
+		__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
+		xSemaphoreGiveFromISR(uart2_Idle_xSemaphore,&xHigherPriorityTaskWoken);
+	}
+}
 
 /********************************************************************************
  *  @brief  HAL_UART_RxCpltCallback  进入中断后HAL库会调用这个函数
@@ -83,6 +89,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	if(USART2 == huart->Instance)//wifi模块串口2
 	{
+		
 //		if(Uart2_Rx_Cnt >= (MAX_RECV_LEN+1))  //溢出判断
 //		{
 //			Uart2_Rx_Cnt = 0;
@@ -96,6 +103,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 //					xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
 //			}
 //		}
+//		p_GPRS->GPRS_BUF->Clear = USART2->SR;
+//		p_GPRS->GPRS_BUF->Clear = USART2->DR;//清USART_IT_IDLE标志
+//		p_GPRS->GPRS_BUF->RX_Flag = SET;//置位接收数据标志
 //		HAL_UART_Receive_IT(&huart2, (uint8_t *)&a2RxBuffer, 1);   //再开启接收中断
 	}
 }

@@ -13,110 +13,104 @@
 #define DEVICE_ID 	"518898092"
 #define PRODUCT_ID 	"217490"
 #define API_KEY		"eC8obJLJaS2PEA0SSrF3gcGbDQ8="
-extern uint8_t pData[];
+
 extern DMA_HandleTypeDef hdma_usart2_tx;
 extern DMA_HandleTypeDef hdma_usart2_rx;
 Connect_Pack G_Connect_Pack;
-Onenet_Pack G_Send_Pack;
-uint8_t g_send_Server_buf[1024];
+MQTT_Send_Pack	G_Send_Pack;   //Onenet_Pack G_Send_Pack;
+uint8_t g_send_Server_buf[PDATA_SIZE];
+int		MsgID = 1;
 extern float temp;
 extern osThreadId Start_Reset_Sim800c_Task_TaskHandle;
 extern Version_Information_Struct G_Version_Information;
+extern GPRS_TypeDef *p_GPRS,GPRS;
+
+
+
 uint16_t MQTT_Connect(void)
 {
 	int len = 0;
 	MQTTPacket_connectData ConnectData = MQTTPacket_connectData_initializer;
 
-	ConnectData.clientID.cstring = "Mango_pi_01";
+	ConnectData.clientID.cstring = "Mango_pi_00001";
 	ConnectData.keepAliveInterval = 360;
 	ConnectData.cleansession = 1;
 	ConnectData.username.cstring = NULL;
 	ConnectData.password.cstring = NULL;
 
-	len = MQTTSerialize_connect(g_send_Server_buf, 1024, &ConnectData);
-	g_send_Server_buf[len] = 0x1A;
-	printf("g_send_Server = %s,len = %d\r\n",g_send_Server_buf,len);
+	len = MQTTSerialize_connect(g_send_Server_buf, PDATA_SIZE, &ConnectData);
 
-//	Send_To_Uart2_Str((int8_t*)g_send_Server_buf,Pack_Len);
-	osDelay(500);
-	printf("len = %d\r\n",len);
-	if (transport_sendPacketBuffer(g_send_Server_buf,len))
+	if (transport_sendPacketBuffer(g_send_Server_buf,len,ACK) == SUCCESS)
 	{
-		len = __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);
- 		len = PDATA_SIZE - len;
-		printf("dat len = %d\r\n",len);
-//		p_GPRS->DOWN_LEN = 0x0000;
-//		if (MQTTPacket_read(g_send_Server_buf, Size, transport_getdata) == CONNACK)
-//		{
-//			unsigned char sessionPresent, connack_rc;
-//			if (MQTTDeserialize_connack(&sessionPresent, &connack_rc, IOT_Buf, Size) != 1 || connack_rc != 0)
-//				return ERROR;
-
-//			else return SUCCESS;
-//		}
+		p_GPRS->DOWN_LEN = 0x0000;
+		Get_MQTT_Dat_From_Uart(p_GPRS);
+		
+		if (MQTTPacket_read(g_send_Server_buf, PDATA_SIZE, transport_getdata) == CONNACK){
+			unsigned char sessionPresent, connack_rc;
+			if (MQTTDeserialize_connack(&sessionPresent, &connack_rc, g_send_Server_buf, PDATA_SIZE) != 1 || connack_rc != 0)
+				return ERROR;
+			else return SUCCESS;
+		}else return ERROR;
+	}else return ERROR;
+}
+/*
+	
+*/
+uint8_t MQTT_Ping(void)
+{
+	int len = 0;
+		
+	len = MQTTSerialize_pingreq(g_send_Server_buf, PDATA_SIZE);
+	
+	if (transport_sendPacketBuffer(g_send_Server_buf,len,ACK))
+	{
+		p_GPRS->DOWN_LEN = 0x0000;
+		Get_MQTT_Dat_From_Uart(p_GPRS);
+		if (MQTTPacket_read(g_send_Server_buf, PDATA_SIZE, transport_getdata) == PINGRESP)
+			return SUCCESS;
+		else return ERROR;
 	}
-
-	osDelay(100);
-	return len;
-//	if (transport_sendPacketBuffer(g_send_Server_buf,len,ACK))
-//	{
-//		p_GPRS->DOWN_LEN = 0x0000;
-//		if (MQTTPacket_read(IOT_Buf, Size, transport_getdata) == CONNACK)
-//		{
-//			unsigned char sessionPresent, connack_rc;
-//			if (MQTTDeserialize_connack(&sessionPresent, &connack_rc, IOT_Buf, Size) != 1 || connack_rc != 0)
-//				return ERROR;
-//			else return SUCCESS;
-//		}
-//		else return ERROR;
-//	}
-//	else return ERROR;
+	else return ERROR;
 }
 
-/*
- * 通用函数组织发送函数包
- * */
-uint16_t Create_Send_Pack(uint8_t* str)
+
+uint8_t MQTT_Subtopic(char * topic_path)
 {
-	uint8_t index = 0;
-	uint8_t i = 0,j;
-	uint32_t pack_len=0;
-	unsigned long encodedByte;
-//	printf("str = %s\r\n",str);
-	memset(g_send_Server_buf,'\0',sizeof(g_send_Server_buf));
-
-	memcpy(g_send_Server_buf+index,&(G_Send_Pack.Pack_type),sizeof(G_Send_Pack.Pack_type));
-	index += sizeof(G_Send_Pack.Pack_type);
-	pack_len = strlen((const char*)str)+8;
-	do{
-		 encodedByte = pack_len % 128;
-		 pack_len = pack_len / 128;
-		 if(pack_len > 0){
-			 encodedByte = encodedByte | 128;
-		 }
-		 G_Send_Pack.RemainedLength[i++] =  (unsigned char)encodedByte;
-	}while(pack_len);
-	for(j = 0;j < i;j++)
-	{
-		g_send_Server_buf[index++] = G_Send_Pack.RemainedLength[j];
-	}
-	G_Send_Pack.JsonStrLen = strlen((const char*)str);
-	g_send_Server_buf[index++] = G_Send_Pack.TopicNameLen>>8;
-	g_send_Server_buf[index++] = G_Send_Pack.TopicNameLen;
-	memcpy(g_send_Server_buf+index,&(G_Send_Pack.TopicName),strlen((const char*)G_Send_Pack.TopicName));
-	index += strlen((const char*)G_Send_Pack.TopicName);
-	memcpy(g_send_Server_buf+index,&(G_Send_Pack.DpType),sizeof(G_Send_Pack.DpType));
-	index += sizeof(G_Send_Pack.DpType);
-	g_send_Server_buf[index++] = G_Send_Pack.JsonStrLen>>8;
-	g_send_Server_buf[index++] = G_Send_Pack.JsonStrLen;
-
-	memcpy(g_send_Server_buf+index,str,strlen((const char*)str));
-	index += strlen((const char*)str);
-
-	g_send_Server_buf[index++] = 0x1A;
+	MQTTString topicString = MQTTString_initializer;
+	int dup = 0;
+	int req_qos = 1;
+	int len = 0;
+	char	topic[64]="\0";
 	
-	cJSON_Delete(G_Send_Pack.JsonStr);
-	return index;
+	strcpy(topic,TOPIC_PRODUCTKEY);
+	//strcat(topic,p_GPRS->IMEI);
+	strcat(topic,topic_path);
+	
+	//topicString.cstring = (char *)&TOPIC_GET;
+	topicString.cstring = (char *)&topic;
+			
+	len = MQTTSerialize_subscribe(g_send_Server_buf, PDATA_SIZE, dup, MsgID++, 1, &topicString, &req_qos);
+	//printf("len = %d\r\n",len);
+	if (transport_sendPacketBuffer(g_send_Server_buf,len,ACK))
+	{	
+		p_GPRS->DOWN_LEN = 0x0000;
+		Get_MQTT_Dat_From_Uart(p_GPRS);
+		if (MQTTPacket_read(g_send_Server_buf, PDATA_SIZE, transport_getdata) == SUBACK) 	/* wait for suback */
+		{
+			unsigned short submsgid;
+			int subcount;
+			int granted_qos;
+			
+			MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos, g_send_Server_buf, PDATA_SIZE);//90 03 00 01 80
+			if ((granted_qos == 0) || (granted_qos == 0x80) )
+				return ERROR;
+			else if (granted_qos != 0)
+				return SUCCESS;
+			else return ERROR;
+		}
+		else return ERROR;
+	}
+	else return ERROR;
 }
 
 /*
@@ -124,36 +118,48 @@ uint16_t Create_Send_Pack(uint8_t* str)
  */
 uint16_t Connect_Server(void)
 {
-	BaseType_t err = 1;
-	uint32_t NotifyValue;
-	uint16_t Pack_Len;
-	uint8_t cmp;
-	while(GPRS_AT_CIPSEND(AT_CIPSEND,">")==ERROR)
-	{
-		printf("Connect_Server CIPSEND reset\r\n");
-		xSemaphoreGive(Sim800c_Semaphore);
-		taskENTER_CRITICAL();				//进入临界区
-		osThreadDef(Reset_Sim800c_Task, Start_Reset_Sim800c_Task, osPriorityNormal, 0, 128);	//开启重启Sim800C初始化调度函数
-		Start_Reset_Sim800c_Task_TaskHandle = osThreadCreate(osThread(Reset_Sim800c_Task), NULL);
-		taskEXIT_CRITICAL();				//退出临界区
-	}
-	Pack_Len = MQTT_Connect();
+	uint8_t flag = 0;
 
-	//需要等待返回数据返回一个SEND OK
-	err = xTaskNotifyWait((uint32_t)0x00,
-			(uint32_t)0xffffffff,
-			(uint32_t*)&NotifyValue,
-			(TickType_t)10000);
-	cmp = strcmp((const char*)Send_data_recv,"\r\nSEND OK\r\n");//对比是不是这个数据
-	osDelay(1000);
-	printf("Connect_OneNet ok\r\n");
-	Reset_Uart_DMA();
-	if(err == pdFALSE){
-		return ERROR;
-	}else if((err == pdTRUE)&&(NotifyValue == RCV_SEND_OK)&&(cmp == 0)){
-		return SUCCESS;
-	}
+	flag += MQTT_Connect();
+	flag += MQTT_Ping();
+	flag += MQTT_Subtopic(TOPIC_ReceiveCmd);
+	printf("flag:3ok flag = %d\r\n",flag);
+	
 }
+
+
+uint8_t MQTT_Pubtopic(char * topic_path, char * payload)
+{
+	MQTTString topicString = MQTTString_initializer;
+	int payloadlen = strlen((const char *)payload);
+	int dup = 0;
+	int qos = 1;
+	int len = 0;
+	char	topic[64]="\0";
+//	printf("payload = %s\r\n",payload);
+//	printf("payloadlen = %d\r\n",payloadlen);
+	strcpy(topic,TOPIC_PRODUCTKEY);
+//	strcat(topic,p_GPRS->IMEI);
+	strcat(topic,topic_path);
+	
+	topicString.cstring = (char *)&topic;
+	
+	len = MQTTSerialize_publish(g_send_Server_buf, PDATA_SIZE, dup, qos, 0, MsgID++, topicString, payload, payloadlen);
+	//myfree(payload);
+	
+	if (transport_sendPacketBuffer(g_send_Server_buf,len,ACK))
+	{
+		p_GPRS->DOWN_LEN = 0x0000;
+		if (MQTTPacket_read(g_send_Server_buf, PDATA_SIZE, transport_getdata) == PUBACK) 	/* wait for puback */
+		{
+			Reset_Uart_DMA(p_GPRS);
+			return SUCCESS;
+		}
+		else return ERROR;
+	}
+	else return ERROR;
+}
+
 
 /*
  * 返回当前信号值
@@ -162,8 +168,8 @@ uint8_t Get_Sim800C_Signal(void)
 {
 	char* str;
 	int n;
-	GPRS_AT_CSQ(AT_CSQ);
-	osDelay(500);
+//	GPRS_AT_CSQ(AT_CSQ);
+//	osDelay(500);
 //	str = strstr((const char*)pData,"+CSQ:");
 //	str = strtok(str,",");
 //	n = atoi(str+5);

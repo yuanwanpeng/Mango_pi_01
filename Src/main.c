@@ -50,7 +50,6 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
-#include "fatfs.h"
 
 /* USER CODE BEGIN Includes */
 #include "LED.h"
@@ -70,6 +69,8 @@
 RTC_HandleTypeDef hrtc;
 
 SPI_HandleTypeDef hspi1;
+
+TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
@@ -96,8 +97,12 @@ osThreadId Start_Strategy_TaskHandle;
 osThreadId Start_LCD12864_TaskHandle;	//12864句柄
 osThreadId Start_BUTTON_TaskHandle;		//扫描按键任务句柄
 Delete_Task_struct G_Delete_Task_struct;//删除任务的结构体
+SemaphoreHandle_t uart2_Idle_xSemaphore;
+SemaphoreHandle_t recv_gprs_cmd_xSemaphore;//二值信号量
+SemaphoreHandle_t send_gprs_dat_xSemaphore;//二值信号量
 SemaphoreHandle_t xSemaphore;
-
+extern uint8_t a2RxBuffer;			//接收中断缓冲
+extern uint8_t aRxBuffer;			//接收中断缓冲
 #ifdef SIM800C_VERSION
 osThreadId Start_SIM800C_TaskHandle;	//800c句柄
 #elif ESP8266_VERSION
@@ -115,6 +120,7 @@ static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_RTC_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_TIM2_Init(void);
 void StartDefaultTask(void const * argument);
 static void MX_NVIC_Init(void);
 
@@ -133,7 +139,7 @@ static void MX_NVIC_Init(void);
   * @retval None
   */
 int main(void)
- {
+{
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
 
@@ -160,11 +166,14 @@ int main(void)
   MX_USART2_UART_Init();
   MX_RTC_Init();
   MX_USART1_UART_Init();
+  MX_TIM2_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-	
+	HAL_UART_Receive_IT(&huart1, (uint8_t *)&aRxBuffer, 1);   //再开启接收中断
+//	HAL_UART_Receive_IT(&huart2, (uint8_t *)&a2RxBuffer, 1);   //再开启接收中断
+	__HAL_UART_ENABLE_IT(&huart2, UART_IT_IDLE);
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -173,6 +182,39 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
+	xSemaphore = xSemaphoreCreateBinary();
+	if( xSemaphore == NULL )
+	{
+		printf("xSemaphore = NULL\r\n");
+	}
+	else
+	{
+	//	printf("xSemaphore = success\r\n");
+	}
+	uart2_Idle_xSemaphore = xSemaphoreCreateBinary(); //接收数据使用的信号量
+	if( uart2_Idle_xSemaphore == NULL )
+	{
+		printf("uart2_Idle_xSemaphore = NULL\r\n");
+	}
+	else
+	{
+	//	printf("xSemaphore = success\r\n");
+	}
+	recv_gprs_cmd_xSemaphore = xSemaphoreCreateBinary();
+	if(recv_gprs_cmd_xSemaphore == NULL)
+	{
+		printf("recv_gprs_cmd_xSemaphore = NULL\r\n");
+	}else{
+		
+	}
+	
+	send_gprs_dat_xSemaphore = xSemaphoreCreateBinary();
+	if(send_gprs_dat_xSemaphore == NULL)
+	{
+		printf("send_gprs_dat_xSemaphore = NULL\r\n");
+	}else{
+		
+	}
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -348,6 +390,44 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   hspi1.Init.CRCPolynomial = 10;
   if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* TIM2 init function */
+static void MX_TIM2_Init(void)
+{
+
+  TIM_ClockConfigTypeDef sClockSourceConfig;
+  TIM_MasterConfigTypeDef sMasterConfig;
+
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 35999;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 199;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  if (HAL_TIM_OnePulse_Init(&htim2, TIM_OPMODE_SINGLE) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -570,27 +650,16 @@ void Start_Delete_Task(void const * argument)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-  /* init code for FATFS */
-  MX_FATFS_Init();
 
   /* USER CODE BEGIN 5 */
-	xSemaphore = xSemaphoreCreateBinary();
-	if( xSemaphore == NULL )
-	{
-		printf("xSemaphore = NULL\r\n");
-	}
-	else
-	{
-	//	printf("xSemaphore = success\r\n");
-	}
-	
-	osDelay(100);
+
 	Check_Strategy();				//检查策略是否正常
 	Init_Humi_Comp();				//初始化温度补偿
 	Check_Max_And_Now_Route();		//检查最大行程和当前行程
 	Check_Delay_Inspection();		//延时检查时间
 	Check_Stroking_Cycle();			//当前干簧管周期
 	Check_Board_Info();				//检查板子信息
+	
 	taskENTER_CRITICAL();			//进入临界区
 
 
@@ -604,7 +673,7 @@ void StartDefaultTask(void const * argument)
 	Start_BUTTON_TaskHandle = osThreadCreate(osThread(Button_Task), NULL);
 
 #ifdef SIM800C_VERSION
-	osThreadDef(Sim800c_Task, Start_Sim800c_Task, osPriorityNormal, 0, 256);		//创建sim800c开始任务
+	osThreadDef(Sim800c_Task, Start_Sim800c_Task, osPriorityNormal, 0, 128);		//创建sim800c开始任务
 	Start_SIM800C_TaskHandle = osThreadCreate(osThread(Sim800c_Task), NULL);
 #endif
 	osThreadDef(HUMI_Task, Start_HUMI_Task, osPriorityNormal, 0, 64);			//创建温度采集模块

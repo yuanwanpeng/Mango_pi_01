@@ -9,6 +9,7 @@
 #define INC_MQTT_H_
 #include "stdint.h"
 #include "cJSON.h"
+#include "GPRS.h"
 typedef struct{
 	uint8_t	Pack_type;
 	uint8_t RemainedLength;
@@ -24,6 +25,12 @@ typedef struct{
 	uint16_t	UserPasswordLen;
 	uint8_t		UserPassword[64];		//api-key
 }Connect_Pack;
+
+typedef enum
+{
+	NOACK = 0,
+	ACK,
+} MQTT_ACK;
 
 //typedef struct{
 //	uint8_t	Pack_type; 		// MQTT类型=3  DupFlag=0 QosLevel=0 Retain=0
@@ -47,20 +54,24 @@ typedef struct{
 //}Version_Information_Pack;
 
 typedef struct{
-	uint8_t	Pack_type; 		// MQTT类型=3  DupFlag=0 QosLevel=0 Retain=0
-	uint8_t RemainedLength[4];	//remainedLength=包长度，注意【不计算这一位和前一位】
-	uint16_t  TopicNameLen;	//主题名长度
-	uint8_t TopicName[10];	 //TopicName=$dp
-	uint8_t DpType;			// DpType=3 TimeSet=0
+//	uint8_t	Pack_type; 		// MQTT类型=3  DupFlag=0 QosLevel=0 Retain=0
+//	uint8_t RemainedLength[4];	//remainedLength=包长度，注意【不计算这一位和前一位】
+//	uint16_t  TopicNameLen;	//主题名长度
+//	uint8_t TopicName[10];	 //TopicName=$dp
+//	uint8_t DpType;			// DpType=3 TimeSet=0
 	uint16_t JsonStrLen;  	 // JsonStrLen
 	cJSON*  JsonStr;
-}Onenet_Pack;
+}MQTT_Send_Pack;
 extern float g_rh;
-extern uint8_t pData[];
 extern float temp;
-extern Onenet_Pack G_Send_Pack;
+extern MQTT_Send_Pack G_Send_Pack;
 uint16_t Connect_Server(void);
 
 uint8_t Get_Sim800C_Signal(void);
-uint16_t Create_Send_Pack(uint8_t* str);
+//uint16_t Create_Send_Pack(uint8_t* str);
+
+uint8_t MQTT_Ping(void);
+uint16_t MQTT_Connect(void);
+uint8_t MQTT_Subtopic(char * topic_path);
+uint8_t MQTT_Pubtopic(char * topic_path, char * payload);
 #endif /* INC_MQTT_H_ */

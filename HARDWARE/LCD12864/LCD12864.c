@@ -23,7 +23,8 @@ osThreadId Start_LCD12864_Menu_TaskHandle = NULL;
 osThreadId Start_LCD12864_Dispatch_TaskHandle;
 
 volatile New_page_enum Now_page = Humi_Page;
-extern uint8_t G_Sim800C_Signal;
+extern	GPRS_TypeDef						*p_GPRS;
+//extern uint8_t G_Sim800C_Signal;
 /*
  * void writec(uchar com)
  * 写命令函数
@@ -473,7 +474,7 @@ void Start_LCD12864_Display_HUMI_Task(void const * argument)
 	LCD12864_Put_Open_Mouth_And_Time();
 	while(1)
 	{
-		LCD12864_Put_Signel_Sim(G_Sim800C_Signal);//显示信号强度
+		LCD12864_Put_Signel_Sim(p_GPRS->CSQ/*G_Sim800C_Signal*/);//显示信号强度
 		LCD12864_Put_HUMI(temp);//这里显示温度
 		LCD12864_Put_Symbol_C();
 		LCD12864_Put_RH(g_rh);
