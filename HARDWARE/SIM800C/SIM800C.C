@@ -73,24 +73,25 @@ void Start_Reset_Sim800c_Task(void const * argument)
 
 	Reset_Uart_DMA(p_GPRS);
 	printf("GPRS_Init = %d\r\n",GPRS_Init(p_GPRS));
-//	printf("_GPRS->AT = %d\r\n_GPRS->ATE = %d\r\n_GPRS->CIPSRIP = %d\r\n",p_GPRS->AT,p_GPRS->ATE,p_GPRS->CIPSRIP);
-//	printf("GPRS_CIPCLOSE_OFF = %d\r\n",GPRS_CIPCLOSE_OFF(p_GPRS));
-//	printf("_GPRS->CIPCLOSE = %d\r\n",p_GPRS->CIPCLOSE);
+	printf("GPRS_CIPCLOSE_OFF = %d\r\n",GPRS_CIPCLOSE_OFF(p_GPRS));
 
 	while(flag != SUCCESS)
 	{
-//		flag = GPRS_RECONNECT(p_GPRS,Port/*p_Aliot->IOT_Host*/);
+		flag = GPRS_RECONNECT(p_GPRS,Port/*p_Aliot->IOT_Host*/);
 		//printf("TCP OK flag = %d\r\n",flag);
 	}
-//	printf("TCP OK flag = %d\r\n",flag);	
-//	GPRS_CIPSTATUS(p_GPRS);
-//	printf("1.0 p_GPRS->CIPSTATUS = %d\r\n",p_GPRS->CIPSTATUS);
-//	vTaskResume( Start_SIM800C_TaskHandle );									//恢复挂起
+	printf("TCP OK flag = %d\r\n",flag);	
+	while(p_GPRS->CIPSTATUS != 6)
+	{
+		GPRS_CIPSTATUS(p_GPRS);
+		printf("1.0 p_GPRS->CIPSTATUS = %d\r\n",p_GPRS->CIPSTATUS);
+	}
+	
+	vTaskResume( Start_SIM800C_TaskHandle );									//恢复挂起
 	
 	taskENTER_CRITICAL();				//进入临界区
-	
-//	osThreadDef(Send_State_data_Task, Start_Send_State_data_Task, osPriorityNormal, 0, 128);	//创建返回温湿度+正反转状态数
-//	Start_Send_State_data_TaskHandle = osThreadCreate(osThread(Send_State_data_Task), NULL);	//
+	osThreadDef(Send_State_data_Task, Start_Send_State_data_Task, osPriorityNormal, 0, 128);	//创建返回温湿度+正反转状态数
+	Start_Send_State_data_TaskHandle = osThreadCreate(osThread(Send_State_data_Task), NULL);	//
 
 	taskEXIT_CRITICAL();				//退出临界区
 	G_Delete_Task_struct.D_Task = Start_Reset_Sim800c_Task_TaskHandle;
@@ -104,19 +105,18 @@ void Start_Reset_Sim800c_Task(void const * argument)
 		osDelay(1000);
 	}
 }
-
+/*
+ * 启动SIM800C任务
+ * */
 void Start_Sim800c_Task(void const * argument)
 {
 //	HAL_TIM_Base_Start_IT(&htim2);
-	Sim800c_Semaphore = xSemaphoreCreateMutex();//创建二值信号量
+	Sim800c_Semaphore = xSemaphoreCreateMutex();			//创建二值信号量
 	if( Sim800c_Semaphore == NULL )
 	{
 		printf("Sim800c_Semaphore = NULL\r\n");
 	}
-	else
-	{
-	//	printf("xSemaphore = success\r\n");
-	}
+
 	taskENTER_CRITICAL();				//进入临界区
 	
 	osThreadDef(Scheduler_data_Task, Start_Scheduler_data_Task, osPriorityAboveNormal, 0, 128);	//开启数据返回任务调度函数
@@ -136,9 +136,9 @@ void Start_Sim800c_Task(void const * argument)
 		osDelay(5000);		
 		GPRS_CIPSTATUS(p_GPRS);
 		osDelay(5000);		
-		GPRS_Network(p_GPRS);
-		//printf("_GPRS->CSQ = %d\r\n",p_GPRS->CSQ);
-		printf("p_GPRS->CIPSTATUS = %d\r\n",p_GPRS->CIPSTATUS);
+		GPRS_CSQ(p_GPRS);
+		printf("_GPRS->CSQ = %d\r\n",p_GPRS->CSQ);			//打印CSQ信号强度
+		printf("p_GPRS->CIPSTATUS = %d\r\n",p_GPRS->CIPSTATUS);	//打印TCP连接状态
 		//12864显示出信号
 		
 	}

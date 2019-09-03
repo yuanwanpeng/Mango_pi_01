@@ -154,64 +154,16 @@
           <Type>0</Type>
           <LineNumber>79</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134233172</Address>
+          <Address>134236348</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>E:\git\Mango_pi_01_EMQ\Src\stm32f1xx_it.c</Filename>
+          <Filename>../Src/stm32f1xx_it.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\Mango_pi_01\../Src/stm32f1xx_it.c\79</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>313</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134225210</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>E:\git\HARDWARE\SIM800C\GPRS.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Mango_pi_01\../HARDWARE/SIM800C/GPRS.c\313</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>313</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134225224</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>E:\git\HARDWARE\SIM800C\GPRS.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Mango_pi_01\../HARDWARE/SIM800C/GPRS.c\313</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>183</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134247204</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>E:\git\HARDWARE\SIM800C\GPRS.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\Mango_pi_01\../HARDWARE/SIM800C/GPRS.c\183</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -294,6 +246,11 @@
           <count>15</count>
           <WinNumber>1</WinNumber>
           <ItemText>GPRS_Rx_Dat</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>p_GPRS-&gt;GPRS_BUF-&gt;RX_Dispose</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

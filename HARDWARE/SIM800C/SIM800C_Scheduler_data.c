@@ -103,7 +103,7 @@ void Process_USART2_Dat(GPRS_TypeDef	* _GPRS)
 	_GPRS->GPRS_BUF->Len[_GPRS->GPRS_BUF->Bufuse] = PDATA_SIZE - __HAL_DMA_GET_COUNTER(&hdma_usart2_rx);//获取接收到的数据的长度
 	_GPRS->GPRS_BUF->Bufuse = !_GPRS->GPRS_BUF->Bufuse;					//切换缓冲区BUFF
 	HAL_UART_Receive_DMA(&huart2, _GPRS->GPRS_BUF->Buf[_GPRS->GPRS_BUF->Bufuse], PDATA_SIZE);//DMA接收开启
-
+	//printf("Process[%s]",GPRS_Rx_Dat);
 	if(Auto_Return_Data(_GPRS) != 0)	//判断自动返回的数据不等于0 表示为自动返回数据不必下面code处理
 	{
 		return;
@@ -245,6 +245,9 @@ void Process_USART2_Dat(GPRS_TypeDef	* _GPRS)
 
 void Clear_Recv_Data(void)
 {
+	static uint8_t i = 0;
+	i++;
+//	printf("i = %d\r\n",i);
 	memcpy(p_GPRS->DOWN_BUF,p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose],p_GPRS->GPRS_BUF->Len[p_GPRS->GPRS_BUF->RX_Dispose]);
 	(p_GPRS->DOWN_BUF[p_GPRS->GPRS_BUF->Len[p_GPRS->GPRS_BUF->RX_Dispose] + 1])  = '\0';//将最后一个数据赋值为0
 	memset(p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose],'\0',strlen(p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose]));//清空数据

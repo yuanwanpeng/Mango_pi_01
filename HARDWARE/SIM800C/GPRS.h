@@ -116,7 +116,7 @@ uint8_t GPRS_DAT(GPRS_TypeDef  * _GPRS,char * cmd,unsigned char* buf, int buflen
 uint8_t GPRS_CSQ(GPRS_TypeDef		* _GPRS);
 uint8_t GPRS_ATE0(GPRS_TypeDef		*_GPRS);
 uint16_t GPRS_CIPSEND(GPRS_TypeDef  * _GPRS,unsigned char* buf, int buflen);
-uint8_t GPRS_Network(GPRS_TypeDef		* _GPRS);
+
 uint8_t Get_MQTT_Dat_From_Uart(GPRS_TypeDef  * _GPRS);
 uint8_t GPRS_CSMINS(GPRS_TypeDef		*_GPRS);
 uint8_t RECV_CMD_ZERO_TIME(GPRS_TypeDef		* _GPRS,char * cmd);

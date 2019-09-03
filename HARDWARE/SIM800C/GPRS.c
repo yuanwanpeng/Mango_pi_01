@@ -30,6 +30,7 @@ void Reset_Uart_DMA(GPRS_TypeDef *_GPRS)
 
 uint8_t GPRS_AT(GPRS_TypeDef	* _GPRS)
 {
+	_GPRS->AT = 0;
 	return GPRS_CMD(_GPRS,"AT\r\n","OK\r\n",0);//等待0秒
 }
 
@@ -39,8 +40,9 @@ uint8_t RECV_CMD_ZERO_TIME_CLEAR(GPRS_TypeDef		* _GPRS,char* cmd,uint8_t* cnt,ui
 	osDelay(100);
 	if((*cnt) == time)
 	{
+		printf("[%s] Field cmd %d\r\n",cmd,*cnt);
+//		printf("_GPRS->AT =  %d\r\n",_GPRS->AT);
 		(*cnt) = 0;
-		printf("[%s] Field cmd\r\n",cmd);
 		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
 		_GPRS->P_CMD = NULL;
 		_GPRS->P_CMD_CHECK = NULL;
@@ -48,10 +50,61 @@ uint8_t RECV_CMD_ZERO_TIME_CLEAR(GPRS_TypeDef		* _GPRS,char* cmd,uint8_t* cnt,ui
 	}
 	return SUCCESS;
 }
-uint8_t RECV_CMD_ZERO_TIME(GPRS_TypeDef		* _GPRS,char * cmd)
+/*
+处理数据标志位的数据
+*/
+uint8_t RECV_CMD_ZERO_TIME(GPRS_TypeDef		* _GPRS,char * cmd)		
 {
 	uint8_t cnt = 0;
 
+	if(strstr(cmd,"AT\r\n"))
+	{
+		while(_GPRS->AT == 0)						//判断标志位
+		{
+			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
+				return ERROR;//如果等于ERROR的话表示超时了
+		}
+	}
+	if(strstr(cmd,"ATE0\r\n"))
+	{
+		while(_GPRS->ATE == 0)
+		{
+			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
+				return ERROR;//如果等于ERROR的话表示超时了
+		}
+	}
+	if(strstr(cmd,"AT+CIPSRIP"))
+	{
+		while(_GPRS->CIPSRIP == 0)				//判断标志位
+		{
+			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,15) == ERROR)
+				return ERROR;//如果等于ERROR的话表示超时了
+		}
+	}
+	if(strstr(cmd,"AT+CSQ"))
+	{
+		while(_GPRS->ATCSQ == 0)					//判断标志位
+		{
+			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
+				return ERROR;//如果等于ERROR的话表示超时了
+		}
+	}	
+	if(strstr(cmd,"AT+CIPSTATUS"))
+	{
+		while(_GPRS->ATCIPSTATUS == 0)
+		{
+			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
+				return ERROR;//如果等于ERROR的话表示超时了
+		}
+	}
+	if(strstr(cmd,"AT+CIPCLOSE"))
+	{
+		while(_GPRS->CIPCLOSE == 0)
+		{
+			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
+				return ERROR;//如果等于ERROR的话表示超时了
+		}
+	}
 	if(strstr(cmd,"AT+CIPSEND="))
 	{
 		while(_GPRS->ATCIPSEND == 0)
@@ -74,129 +127,20 @@ uint8_t RECV_CMD_ZERO_TIME(GPRS_TypeDef		* _GPRS,char * cmd)
 	//	xSemaphoreGive(Sim800c_Semaphore);//'>'不可以解锁二值信号量
 		return SUCCESS;
 	}
-	if(strstr(cmd,"AT+CSMINS?"))//检测是否插入simcard
-	{
-		while(_GPRS->ATCSMINS == 0)
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
-			{
-				printf("error\r\n");
-				return ERROR;//如果等于ERROR的话表示超时了
-			}
-		}
-		printf("cl");
-		Clear_Recv_Data();	//清空处理完毕的数据
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}
 	
-	if(strstr(cmd,"AT+CIPSTATUS"))
-	{
-		while(_GPRS->ATCIPSTATUS == 0)
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
-				return ERROR;//如果等于ERROR的话表示超时了
-		}
-		Clear_Recv_Data();	//清空处理完毕的数据
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}
-	if(strstr(cmd,"AT\r\n"))
-	{
-		while(_GPRS->AT == 0)
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
-				return ERROR;//如果等于ERROR的话表示超时了
-		}
-		Clear_Recv_Data();	//清空处理完毕的数据
-		printf("p_GPRS->DOWN_BUF AT = %s\r\n",p_GPRS->DOWN_BUF);
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}
-	if(strstr(cmd,"ATE0\r\n"))
-	{
-		while(_GPRS->ATE == 0)
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
-				return ERROR;//如果等于ERROR的话表示超时了
-		}
-		Clear_Recv_Data();	//清空处理完毕的数据
-		printf("p_GPRS->DOWN_BUF ATE0 = %s\r\n",p_GPRS->DOWN_BUF);
-		printf("GPRS_Rx_Dat ATE0 = %s\r\n",GPRS_Rx_Dat);
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}
-	if(strstr(cmd,"AT+CIPSRIP"))
-	{
-		while(_GPRS->CIPSRIP == 0)
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
-				return ERROR;//如果等于ERROR的话表示超时了
-		}
-		Clear_Recv_Data();	//清空处理完毕的数据
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}
-	if(strstr(cmd,"AT+CIPCLOSE"))
-	{
-		while(_GPRS->CIPCLOSE == 0)
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
-				return ERROR;//如果等于ERROR的话表示超时了
-		}
-		Clear_Recv_Data();	//清空处理完毕的数据
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}//AT+CIPSTART=
-	if(strstr(cmd,"AT+CIPSTART="))
-	{
-		while(_GPRS->CIPSTATUS != 8)//表示connect OK
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,100) == ERROR)
-				return ERROR;//如果等于ERROR的话表示超时了
-		}
-		Clear_Recv_Data();	//清空处理完毕的数据
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}
-	if(strstr(cmd,"AT+CSQ"))
-	{
-		while(_GPRS->ATCSQ == 0)//表示connect OK
-		{
-			if(RECV_CMD_ZERO_TIME_CLEAR(_GPRS,cmd,&cnt,3) == ERROR)
-				return ERROR;//如果等于ERROR的话表示超时了
-		}
-		
-		Clear_Recv_Data();	//清空处理完毕的数据
-		printf("CSQ SUCCESS\r\n");
-		printf("p_GPRS->DOWN_BUF = %s\r\n",p_GPRS->DOWN_BUF);
-		_GPRS->P_CMD = NULL;
-		_GPRS->P_CMD_CHECK = NULL;
-		xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
-		return SUCCESS;
-	}
-	
+//	printf("p_GPRS->DOWN_BUF cmd = %s = %s\r\n",cmd,p_GPRS->DOWN_BUF);
+	Clear_Recv_Data();	//清空处理完毕的数据
+	_GPRS->P_CMD = NULL;
+	_GPRS->P_CMD_CHECK = NULL;
+	xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
+	return SUCCESS;
 }
 uint8_t GPRS_CMD(GPRS_TypeDef		* _GPRS, char * cmd, char *check,uint8_t delay_time)
 {
 	xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//上锁二值信号量
 	
-	_GPRS->P_CMD = cmd;
-	_GPRS->P_CMD_CHECK = check;
+	_GPRS->P_CMD = cmd;										//初始化发送的命令
+	_GPRS->P_CMD_CHECK = check;						//初始化检测数据
 	
 	Send_To_Uart2_Str((int8_t*)cmd,strlen(cmd));		//发送命令	
 
@@ -254,7 +198,9 @@ uint8_t GPRS_CIPSTATUS(GPRS_TypeDef		* _GPRS)
 //关闭GPRS链接
 uint8_t GPRS_CIPCLOSE_OFF(GPRS_TypeDef		* _GPRS)//MAX 90S
 {
+	_GPRS->CIPCLOSE = 0;
 	GPRS_CMD(_GPRS,"AT+CIPCLOSE\r\n","ERROR\r\n",0);
+	_GPRS->CIPCLOSE = 0;
 	return (GPRS_CMD(_GPRS,"AT+CIPCLOSE\r\n","ERROR\r\n",0));
 }
 
@@ -274,31 +220,31 @@ uint8_t GPRS_RECONNECT(GPRS_TypeDef		* _GPRS, char * host)
 	uint8_t flag=ERROR,count = 0;
 	
 	osDelay(1000);
-//	GPRS_CSQ(_GPRS);
+	GPRS_CSQ(_GPRS);
 //	osDelay(5000);
 //	GPRS_CSMINS(_GPRS);		//检测simcard SIM Inserted 
-//	if (((_GPRS->CSQ > 10) && (_GPRS->CSQ < 32))&&1)
-//	{
-//		if(count == 0)
-//		{
-//			//GPRS_CGDCONT(_GPRS);
-//			flag = GPRS_CIPSTART_ON(_GPRS);
-//			count++;
-//		}
-//		GPRS_CIPSTATUS(p_GPRS);	//获取当前TCP连接状态
-//		if((p_GPRS->CIPSTATUS == 6)||(flag == SUCCESS))
-//		{
-//			return SUCCESS;
-//		}else if(p_GPRS->CIPSTATUS == 8){//CLOSED
-//			count = 0;//重新连接
-//		}else if(p_GPRS->CIPSTATUS == 9){//PDP 
-//			GPRS_CIPCLOSE_OFF(_GPRS);
-//		//	GPRS_CGDCONT(_GPRS);
-//			GPRS_CIPSHUT(_GPRS);
-//			count = 0;
-//		}
-//		printf("flag = %d\r\n",flag);
-//	}
+	if ((_GPRS->CSQ > 10) && (_GPRS->CSQ < 32))
+	{
+		if(count == 0)
+		{
+			//GPRS_CGDCONT(_GPRS);
+			flag = GPRS_CIPSTART_ON(_GPRS);
+			count++;
+		}
+		GPRS_CIPSTATUS(p_GPRS);	//获取当前TCP连接状态
+		if((p_GPRS->CIPSTATUS == 6)&&(flag == SUCCESS))
+		{
+			return SUCCESS;
+		}else if(p_GPRS->CIPSTATUS == 8){//CLOSED
+			count = 0;//重新连接
+		}else if(p_GPRS->CIPSTATUS == 9){//PDP 
+			GPRS_CIPCLOSE_OFF(_GPRS);
+		//	GPRS_CGDCONT(_GPRS);
+			GPRS_CIPSHUT(_GPRS);
+			count = 0;
+		}
+		printf("flag = %d\r\n",flag);
+	}
 	
 	return flag;
 }
@@ -307,12 +253,19 @@ uint8_t GPRS_RECONNECT(GPRS_TypeDef		* _GPRS, char * host)
 uint8_t GPRS_CSQ(GPRS_TypeDef		* _GPRS)
 {
 	char a[3];
+	char i = 0;
 	char *num=a;
 	_GPRS->ATCSQ = 0;		//归零操作
 	if(GPRS_CMD(_GPRS,"AT+CSQ\r\n","OK\r\n",0) == SUCCESS)
 	{
 		GPRS_Rx_Dat = p_GPRS->DOWN_BUF;
-		printf("GPRS_Rx_Dat CSQ = [%s]\r\n",GPRS_Rx_Dat);
+		while((strstr(GPRS_Rx_Dat,"+CSQ:") == NULL)&&(i==0))
+		{
+			Clear_Recv_Data();
+			GPRS_Rx_Dat = p_GPRS->DOWN_BUF;
+			i = 1;
+		}
+		printf("******GPRS_Rx_Dat******** CSQ = [%s]\r\n",GPRS_Rx_Dat);
 		if (strstr(GPRS_Rx_Dat,"+CSQ:"))//
 		{
 			while(*GPRS_Rx_Dat != ' ')
@@ -336,28 +289,17 @@ uint8_t GPRS_CSQ(GPRS_TypeDef		* _GPRS)
 			_GPRS->CSQ_CH[2] = a[2];
 			
 			_GPRS->CSQ = atoi(a); 
-//			Clear_Recv_Data();
 			return SUCCESS;
 		}
 		else {
-//			Clear_Recv_Data();
 			return ERROR;
 		}
 	}
 	else {
-//		Clear_Recv_Data();
 		return ERROR;
 	}
 }
 
-
-uint8_t GPRS_Network(GPRS_TypeDef		* _GPRS)
-{
-	GPRS_CSQ(_GPRS);
-	if ((_GPRS->CSQ >= 10) && (_GPRS->CSQ <= 31))
-		return SUCCESS;
-	else return ERROR;
-}
 
 uint8_t GPRS_CIPSRIP(GPRS_TypeDef		*_GPRS)
 {
@@ -419,7 +361,7 @@ uint8_t GPRS_Init(GPRS_TypeDef		*_GPRS)
 		osDelay(100);
 	}
 	while(GPRS_ATE0(_GPRS) != SUCCESS);
-//	while(GPRS_CIPSRIP(_GPRS) != SUCCESS);
+	while(GPRS_CIPSRIP(_GPRS) != SUCCESS);
 	return SUCCESS;
 }
 
@@ -427,7 +369,7 @@ uint8_t GPRS_ATE0(GPRS_TypeDef		*_GPRS)
 {
 	return GPRS_CMD(_GPRS,"ATE0\r\n","OK\r\n",0);
 }
-uint8_t GPRS_DAT(GPRS_TypeDef  * _GPRS,char * cmd,unsigned char* buf, int buflen)
+ uint8_t GPRS_DAT(GPRS_TypeDef  * _GPRS,char * cmd,unsigned char* buf, int buflen)
 {
 	uint8_t cnt = 0;
 	xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//上锁二值信号量UART2不允许其他数据发出
