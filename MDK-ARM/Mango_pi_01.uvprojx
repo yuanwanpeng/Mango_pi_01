@@ -583,14 +583,14 @@
               <FilePath>..\HARDWARE\SIM800C\SIM800C_Scheduler_data.c</FilePath>
             </File>
             <File>
-              <FileName>SIM800C_Recv_Onenet_data.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SIM800C\SIM800C_Recv_Onenet_data.c</FilePath>
-            </File>
-            <File>
               <FileName>GPRS.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\SIM800C\GPRS.c</FilePath>
+            </File>
+            <File>
+              <FileName>SIM800C_Recv_Mqtt_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\SIM800C\SIM800C_Recv_Mqtt_data.c</FilePath>
             </File>
           </Files>
         </Group>

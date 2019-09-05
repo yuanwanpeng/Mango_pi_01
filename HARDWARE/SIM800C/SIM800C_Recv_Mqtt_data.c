@@ -6,7 +6,7 @@
  */
 
 
-#include "SIM800C_Recv_Onenet_data.h"
+#include "SIM800C_Recv_Mqtt_data.h"
 #include "main.h"
 #include "HUMI.h"
 #include "relay.h"
@@ -18,7 +18,7 @@ uint8_t Recv_cmd_data[512];
 /*
  * 解析接收数据的函数
  */
-void Start_Recv_Onenet_data_Task(void const * argument)
+void Start_Recv_Mqtt_data_Task(void const * argument)
 {
 	BaseType_t err = 1;
 	uint32_t NotifyValue;

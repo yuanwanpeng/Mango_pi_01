@@ -84,9 +84,9 @@ void Start_Reset_Sim800c_Task(void const * argument)
 	while(p_GPRS->CIPSTATUS != 6)
 	{
 		GPRS_CIPSTATUS(p_GPRS);
+		osDelay(100);
 		printf("1.0 p_GPRS->CIPSTATUS = %d\r\n",p_GPRS->CIPSTATUS);
 	}
-	
 	vTaskResume( Start_SIM800C_TaskHandle );									//恢复挂起
 	
 	taskENTER_CRITICAL();				//进入临界区
@@ -125,9 +125,8 @@ void Start_Sim800c_Task(void const * argument)
 	osThreadDef(Reset_Sim800c_Task, Start_Reset_Sim800c_Task, osPriorityNormal, 0, 128);	//开启重启Sim800C初始化调度函数
 	Start_Reset_Sim800c_Task_TaskHandle = osThreadCreate(osThread(Reset_Sim800c_Task), NULL);
 
-	
-//	osThreadDef(Recv_Onenet_data_Task, Start_Recv_Onenet_data_Task, osPriorityNormal, 0, 128);	//创建接收数据
-//	Start_Recv_Onenet_data_TaskHandle = osThreadCreate(osThread(Recv_Onenet_data_Task), NULL);	//
+	osThreadDef(Recv_Mqtt_data_Task, Start_Recv_Mqtt_data_Task, osPriorityNormal, 0, 128);	//创建接收数据
+	Start_Recv_Onenet_data_TaskHandle = osThreadCreate(osThread(Recv_Mqtt_data_Task), NULL);	//
 
 	taskEXIT_CRITICAL();				//退出临界区
 
