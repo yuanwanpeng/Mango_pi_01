@@ -33,7 +33,7 @@ void Start_Send_State_data_Task(void const * argument)
 	while(1)
 	{
 		flag = MQTT_Ping();
-		printf("flag:1ok flag = %d\r\n",flag);
+ 		printf("flag:1ok flag = %d\r\n",flag);
 		Send_Temp_Humi_F_R();
 		osDelay(15000);
 	}

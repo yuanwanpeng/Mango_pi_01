@@ -22,5 +22,5 @@ extern osThreadId Start_SIM800C_TaskHandle;	//800c¾ä±ú
 void Start_Scheduler_data_Task(void const * argument);
 void Process_USART2_Dat(GPRS_TypeDef	* _GPRS);
 uint8_t Auto_Return_Data(GPRS_TypeDef	* _GPRS);
-void Clear_Recv_Data(void);
+uint16_t Clear_Recv_Data(void);
 #endif /* HARDWARE_SIM800C_SIM800C_SCHEDULER_DATA_H_ */

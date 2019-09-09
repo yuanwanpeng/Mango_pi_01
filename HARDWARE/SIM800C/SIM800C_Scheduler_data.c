@@ -187,15 +187,18 @@ void Process_USART2_Dat(GPRS_TypeDef	* _GPRS)
 		}
 	}
 	
-	
-	if(RECV_MQTT_DAT)	//RECV
+	if(RECV_MQTT_DAT)	//RECV (strstr(_GPRS->P_CMD, "RECV"))
 	{
 		if(strstr(GPRS_Rx_Dat,_GPRS->P_CMD_CHECK))	//RECV FROM
 		{
-			xSemaphoreGiveFromISR(send_gprs_dat_xSemaphore,&xHigherPriorityTaskWoken);
+			while(xSemaphoreGive(send_gprs_dat_xSemaphore) != pdTRUE)
+			{
+				printf("1\r\n");
+				osDelay(10);
+			}
 			return;
 		}
-	}	
+	}
 	if(CMP_AT)
 	{
 		if(strstr(GPRS_Rx_Dat,"OK\r\n"))
@@ -237,22 +240,19 @@ void Process_USART2_Dat(GPRS_TypeDef	* _GPRS)
 		}
 	}
 	
-	//printf("GPRS_Rx_Dat = [%s]",GPRS_Rx_Dat);//打印出没有能力解析的数据
-	//	if (strstr(GPRS_Rx_Dat,"SMS Ready\r\n"))
-//		_GPRS->READY++;
 	Clear_Recv_Data();
 }
 
-void Clear_Recv_Data(void)
+uint16_t Clear_Recv_Data(void)
 {
-	static uint8_t i = 0;
-	i++;
-//	printf("i = %d\r\n",i);
+	uint8_t len = 0;
+	len = p_GPRS->GPRS_BUF->Len[p_GPRS->GPRS_BUF->RX_Dispose];
 	memcpy(p_GPRS->DOWN_BUF,p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose],p_GPRS->GPRS_BUF->Len[p_GPRS->GPRS_BUF->RX_Dispose]);
 	(p_GPRS->DOWN_BUF[p_GPRS->GPRS_BUF->Len[p_GPRS->GPRS_BUF->RX_Dispose] + 1])  = '\0';//将最后一个数据赋值为0
 	memset(p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose],'\0',strlen(p_GPRS->GPRS_BUF->Buf[p_GPRS->GPRS_BUF->RX_Dispose]));//清空数据
 	//p_GPRS->GPRS_BUF->Buf[_GPRS->GPRS_BUF->RX_Dispose]这里面的数据处理完毕
 	p_GPRS->GPRS_BUF->RX_Dispose = !p_GPRS->GPRS_BUF->RX_Dispose;//切换待处理的缓冲区指针
+	return len;
 }
 
 

@@ -45,12 +45,16 @@ uint16_t MQTT_Connect(void)
 		p_GPRS->DOWN_LEN = 0x0000;
 		Get_MQTT_Dat_From_Uart(p_GPRS);
 		
-		if (MQTTPacket_read(g_send_Server_buf, PDATA_SIZE, transport_getdata) == CONNACK){
+		if (MQTTPacket_read(p_GPRS->DOWN_BUF, PDATA_SIZE, transport_getdata) == CONNACK){
+			printf("CONNACK OK\r\n");
 			unsigned char sessionPresent, connack_rc;
-			if (MQTTDeserialize_connack(&sessionPresent, &connack_rc, g_send_Server_buf, PDATA_SIZE) != 1 || connack_rc != 0)
+			if (MQTTDeserialize_connack(&sessionPresent, &connack_rc, p_GPRS->DOWN_BUF, PDATA_SIZE) != 1 || connack_rc != 0)
 				return ERROR;
 			else return SUCCESS;
-		}else return ERROR;
+		}else {
+			printf("CONNACK ERROR\r\n");
+			return ERROR;
+		}
 	}else return ERROR;
 }
 /*
@@ -66,7 +70,7 @@ uint8_t MQTT_Ping(void)
 	{
 		p_GPRS->DOWN_LEN = 0x0000;
 		Get_MQTT_Dat_From_Uart(p_GPRS);
-		if (MQTTPacket_read(g_send_Server_buf, PDATA_SIZE, transport_getdata) == PINGRESP)
+		if (MQTTPacket_read(p_GPRS->DOWN_BUF, PDATA_SIZE, transport_getdata) == PINGRESP)
 			return SUCCESS;
 		else return ERROR;
 	}
@@ -95,13 +99,13 @@ uint8_t MQTT_Subtopic(char * topic_path)
 	{	
 		p_GPRS->DOWN_LEN = 0x0000;
 		Get_MQTT_Dat_From_Uart(p_GPRS);
-		if (MQTTPacket_read(g_send_Server_buf, PDATA_SIZE, transport_getdata) == SUBACK) 	/* wait for suback */
+		if (MQTTPacket_read(p_GPRS->DOWN_BUF, PDATA_SIZE, transport_getdata) == SUBACK) 	/* wait for suback */
 		{
 			unsigned short submsgid;
 			int subcount;
 			int granted_qos;
 			
-			MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos, g_send_Server_buf, PDATA_SIZE);//90 03 00 01 80
+			MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos, p_GPRS->DOWN_BUF, PDATA_SIZE);//90 03 00 01 80
 			if ((granted_qos == 0) || (granted_qos == 0x80) )
 				return ERROR;
 			else if (granted_qos != 0)
@@ -121,9 +125,11 @@ uint16_t Connect_Server(void)
 	uint8_t flag = 0;
 
 	flag += MQTT_Connect();
+	printf("MQTT_Connect flag = %d\r\n",flag);
 	flag += MQTT_Ping();
+	printf("MQTT_Ping flag = %d\r\n",flag);
 	flag += MQTT_Subtopic(TOPIC_ReceiveCmd);
-	printf("flag:3ok flag = %d\r\n",flag);
+	printf("MQTT_Subtopic flag = %d\r\n",flag);
 	
 }
 

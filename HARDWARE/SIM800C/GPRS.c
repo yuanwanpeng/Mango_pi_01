@@ -16,6 +16,7 @@ extern TIM_HandleTypeDef htim2;
 Timer_TypeDef							*p_Tap_Timer,Tap_Timer;
 extern SemaphoreHandle_t recv_gprs_cmd_xSemaphore;//二值信号量
 extern SemaphoreHandle_t send_gprs_dat_xSemaphore;//二值信号量
+extern uint8_t g_send_Server_buf[];
 
 void Reset_Uart_DMA(GPRS_TypeDef *_GPRS)
 {
@@ -369,7 +370,7 @@ uint8_t GPRS_ATE0(GPRS_TypeDef		*_GPRS)
 {
 	return GPRS_CMD(_GPRS,"ATE0\r\n","OK\r\n",0);
 }
- uint8_t GPRS_DAT(GPRS_TypeDef  * _GPRS,char * cmd,unsigned char* buf, int buflen)
+uint8_t GPRS_DAT(GPRS_TypeDef  * _GPRS,char * cmd,unsigned char* buf, int buflen)
 {
 	uint8_t cnt = 0;
 	xSemaphoreTake(Sim800c_Semaphore,portMAX_DELAY);//上锁二值信号量UART2不允许其他数据发出
@@ -409,6 +410,7 @@ uint8_t GPRS_ATE0(GPRS_TypeDef		*_GPRS)
 			xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
 			_GPRS->P_CMD = NULL;
 			_GPRS->P_CMD_CHECK = NULL;
+			printf("DAT_RECV ERROR\r\n");
 			return ERROR;
 		}
 	}
@@ -417,6 +419,7 @@ uint8_t GPRS_ATE0(GPRS_TypeDef		*_GPRS)
 	_GPRS->P_CMD = NULL;
 	_GPRS->P_CMD_CHECK = NULL;
 	xSemaphoreGive(Sim800c_Semaphore);//解锁二值信号量
+	printf("DAT_RECV SUCCESS\r\n");//之后出现了停止
 	return SUCCESS;
 }
 
@@ -442,10 +445,11 @@ uint8_t GPRS_RECV(GPRS_TypeDef  * _GPRS,uint16_t* p_len)
 	{
 		if(strstr(p_GPRS->GPRS_BUF->Buf[_GPRS->GPRS_BUF->RX_Dispose],_GPRS->P_CMD_CHECK))// "RECV FROM"
 		{
-//			*p_len = _GPRS->GPRS_BUF->Len;
+//			*p_len = _GPRS->GPRS_BUF->Len[!_GPRS->GPRS_BUF->Bufuse];
 //			memcpy(p_GPRS->DOWN_BUF,p_GPRS->GPRS_BUF->Buf[!_GPRS->GPRS_BUF->Bufuse],_GPRS->GPRS_BUF->Len);
 //			memset(p_GPRS->GPRS_BUF->Buf[!_GPRS->GPRS_BUF->Bufuse],'\0',_GPRS->GPRS_BUF->Len);
-			Clear_Recv_Data();
+			*p_len = Clear_Recv_Data();
+			printf("*p_len = %d\r\n",*p_len);
 			return SUCCESS;
 		}else{
 			return ERROR;
@@ -475,6 +479,7 @@ uint8_t Get_MQTT_Dat_From_Uart(GPRS_TypeDef  * _GPRS)
 	printf("len = %d\r\n",len);
 	printf("p = %s",p);
 
+	//memcpy(p_GPRS->DOWN_BUF,p,len);
 	memcpy(p_GPRS->DOWN_BUF,p,len);
 	return SUCCESS;
 }

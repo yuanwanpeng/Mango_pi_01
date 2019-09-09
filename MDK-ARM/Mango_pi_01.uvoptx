@@ -154,7 +154,7 @@
           <Type>0</Type>
           <LineNumber>79</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134236388</Address>
+          <Address>134236536</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -164,6 +164,22 @@
           <Filename>../Src/stm32f1xx_it.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\Mango_pi_01\../Src/stm32f1xx_it.c\79</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>48</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134249374</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\PROTOCOL\Mqtt.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\Mango_pi_01\../PROTOCOL/Mqtt.c\48</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -180,7 +196,7 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GPRS_Rx_Dat</ItemText>
+          <ItemText>rcv_len</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
@@ -190,42 +206,67 @@
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GPRS_Rx_Dat+2</ItemText>
+          <ItemText>g_send_Server_buf</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GPRS_Rx_Dat</ItemText>
+          <ItemText>p</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>buf</ItemText>
+          <ItemText>CIPSEND</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>buflen</ItemText>
+          <ItemText>p_GPRS-&gt;DOWN_BUF</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>1</WinNumber>
-          <ItemText>CIPSEND</ItemText>
+          <ItemText>GPRS_Rx_Dat</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_GPRS-&gt;DOWN_BUF</ItemText>
+          <ItemText>flag</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GPRS_Rx_Dat</ItemText>
+          <ItemText>PDATA_SIZE</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>1</WinNumber>
-          <ItemText>p_GPRS-&gt;GPRS_BUF-&gt;RX_Dispose</ItemText>
+          <ItemText>g_send_Server_buf</ItemText>
+        </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>p_GPRS-&gt;DOWN_BUF</ItemText>
+        </Ww>
+        <Ww>
+          <count>13</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>xSemaphore</ItemText>
+        </Ww>
+        <Ww>
+          <count>14</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>send_gprs_dat_xSemaphore</ItemText>
+        </Ww>
+        <Ww>
+          <count>15</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>Sim800c_Semaphore</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>uart2_Idle_xSemaphore</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -814,7 +855,7 @@
 
   <Group>
     <GroupName>CJSON</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

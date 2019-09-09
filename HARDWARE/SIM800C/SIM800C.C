@@ -72,6 +72,7 @@ void Start_Reset_Sim800c_Task(void const * argument)
 	p_GPRS->GPRS_BUF = &GPRS_Buf_T;
 
 	Reset_Uart_DMA(p_GPRS);
+
 	printf("GPRS_Init = %d\r\n",GPRS_Init(p_GPRS));
 	printf("GPRS_CIPCLOSE_OFF = %d\r\n",GPRS_CIPCLOSE_OFF(p_GPRS));
 
@@ -84,7 +85,7 @@ void Start_Reset_Sim800c_Task(void const * argument)
 	while(p_GPRS->CIPSTATUS != 6)
 	{
 		GPRS_CIPSTATUS(p_GPRS);
-		osDelay(100);
+		osDelay(800);
 		printf("1.0 p_GPRS->CIPSTATUS = %d\r\n",p_GPRS->CIPSTATUS);
 	}
 	vTaskResume( Start_SIM800C_TaskHandle );									//»Ö¸´¹ÒÆð
